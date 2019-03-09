@@ -35,6 +35,7 @@ setopt CORRECT
 export EDITOR="myemacs"
 eval $(dircolors -b)
 
+[ -f ~/.zplug/init.zsh ] || (curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh)
 source ~/.zplug/init.zsh
 
 zplug "changyuheng/zsh-interactive-cd"
@@ -46,7 +47,7 @@ zplug "MichaelAquilina/zsh-you-should-use"
 zplug "Tarrasch/zsh-bd"
 zplug "hcgraf/zsh-sudo"
 zplug "desyncr/auto-ls"
-# install wting/autojump manually
+zplug "skywind3000/z.lua"
 
 if ! zplug check ; then
     printf "Install? [y/N]: "
@@ -62,7 +63,8 @@ bindkey '^S' history-incremental-search-forward
 bindkey '^P' history-search-backward
 bindkey '^N' history-search-forward
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -f ~/.fzf.zsh ] || (git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf && ~/.fzf/install)
+source ~/.fzf.zsh
 
 alias ..="cd .."
 alias ...="cd ../.."
@@ -71,16 +73,10 @@ alias ....="cd ../../.."
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
-
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'
     alias egrep='egrep --color=auto'
 fi
-
-# colored GCC warnings and errors
-#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
 AUTO_LS_COMMANDS=(ls)
 auto-ls-ls(){
@@ -97,38 +93,9 @@ if [ $+commands[fd] ]; then
 	alias find=fd
 fi
 
-# Using /usr/bin/myemacs script instead
+# z.lua configuration
+eval "$(lua ~/.zplug/repos/skywind3000/z.lua/z.lua --init zsh)"
 
-# my-emacs(){
-#    RESULT=`ps -e | grep 'emacs'`
-#    if [ -z "$RESULT" ]; then
-#        /usr/bin/emacs
-#    else
-#        /usr/bin/emacsclient -c
-#    fi
-# }
-
-alias emacs=myemacs
-
-# added by Anaconda3 5.3.0 installer
-# >>> conda init >>>
-# !! Contents within this block are managed by 'conda init' !!
-#__conda_setup="$(CONDA_REPORT_ERRORS=false '/home/zenith-john/anaconda3/bin/conda' shell.bash hook 2> /dev/null)"
-#if [ $? -eq 0 ]; then
-#    \eval "$__conda_setup"
-#else
-#    if [ -f "/home/zenith-john/anaconda3/etc/profile.d/conda.sh" ]; then
-#        . "/home/zenith-john/anaconda3/etc/profile.d/conda.sh"
-#        CONDA_CHANGEPS1=false conda activate base
-#    else
-#        \export PATH="/home/zenith-john/anaconda3/bin:$PATH"
-#    fi
-# fi
-# unset __conda_setup
-# <<< conda init <<<
-#
-# autojump configuration
-[[ -s /home/zenith-john/.autojump/etc/profile.d/autojump.sh ]] && source /home/zenith-john/.autojump/etc/profile.d/autojump.sh
 autoload -U compinit && compinit -u
 
 source ~/.zprofile
