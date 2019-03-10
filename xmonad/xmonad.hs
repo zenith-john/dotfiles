@@ -184,7 +184,8 @@ myAdditionalKeys =
   ("M-; m", runOrRaiseNext "mymatlab" (className =? "MATLAB R2018b - academic use")),
   ("M-; q", namedScratchpadAction myScratchPads "terminal"),
   ("M-; i", namedScratchpadAction myScratchPads "ipython"),
-  ("M-; o", namedScratchpadAction myScratchPads "org"),
+  ("M-; a", namedScratchpadAction myScratchPads "org-agenda"),
+  ("M-; c", namedScratchpadAction myScratchPads "org-capture"),
   ("M-; t", namedScratchpadAction myScratchPads "mail")
   , ("<Print>", spawn "flameshot gui")
   , ("M-n", switchLayer)
@@ -317,7 +318,8 @@ myManageHook =
 myScratchPads =
   [NS "terminal" "urxvtc -title scratchpad" (title =? "scratchpad") doTopFloat
    , NS "ipython" "urxvtc -title ipython -e ipython" (title =? "ipython") doTopLeftFloat
-   , NS "org" "org-agenda" (title =? "Org") doRightFloat
+   , NS "org-agenda" "org-agenda" (title =? "org-agenda") doRightFloat
+   , NS "org-capture" "org-capture" (title =? "org-capture") doRightFloat
    , NS "mail" "thunderbird" (className =? "Thunderbird") doLeftFloat]
   where
     doTopFloat = customFloating $ W.RationalRect (1/4) 0 (1/2) (1/2)
