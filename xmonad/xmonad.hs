@@ -186,6 +186,7 @@ myAdditionalKeys =
   ("M-; i", namedScratchpadAction myScratchPads "ipython"),
   ("M-; a", namedScratchpadAction myScratchPads "org-agenda"),
   ("M-; c", namedScratchpadAction myScratchPads "org-capture"),
+  ("M-; n", namedScratchpadAction myScratchPads "org-note"),
   ("M-; t", namedScratchpadAction myScratchPads "mail")
   , ("<Print>", spawn "flameshot gui")
   , ("M-n", switchLayer)
@@ -320,6 +321,7 @@ myScratchPads =
    , NS "ipython" "urxvtc -title ipython -e ipython" (title =? "ipython") doTopLeftFloat
    , NS "org-agenda" "org-agenda" (title =? "org-agenda") doRightFloat
    , NS "org-capture" "org-capture" (title =? "org-capture") doRightFloat
+   , NS "org-note" "org-note" (title =? "org-note") doRightFloat
    , NS "mail" "thunderbird" (className =? "Thunderbird") doLeftFloat]
   where
     doTopFloat = customFloating $ W.RationalRect (1/4) 0 (1/2) (1/2)

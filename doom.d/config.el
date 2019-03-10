@@ -3,7 +3,7 @@
 ;; Place your private configuration here
 
 ;; Set the font
-(setq doom-font (font-spec :family "Sarasa Mono SC" :size 14 :weight 'bold))
+(setq doom-font (font-spec :family "Sarasa Mono SC" :size 16 :weight 'bold))
 
 ;; Change leader key to ,
 (setq doom-leader-key ","
