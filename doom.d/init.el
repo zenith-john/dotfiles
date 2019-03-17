@@ -12,7 +12,8 @@
        workspaces        ; tab emulation, persistence & separate workspaces
 
        :completion
-       company           ; the ultimate code completion backend
+       (company        ; the ultimate code completion backend
+        +auto)
        ;;helm             ; the *other* search engine for love and life
        ;;ido              ; the other *other* search engine...
        ivy              ; a search engine for love and life
@@ -34,7 +35,7 @@
         +defaults)       ; default popup rules
        ;;pretty-code       ; replace bits of code with pretty symbols
        ;;tabbar            ; FIXME an (incomplete) tab bar for Emacs
-       unicode           ; extended unicode support for various languages
+       ;;unicode           ; extended unicode support for various languages
        vc-gutter         ; vcs diff in the fringe
        vi-tilde-fringe   ; fringe tildes to mark beyond EOB
        window-select     ; visually switch windows

@@ -1,2 +1,2 @@
 #!/bin/sh
-emacsclient -c -F '((name . "org-agenda"))' -e "(progn (setq org-agenda-window-setup 'only-window)(org-agenda 0 \"a\"))"
+emacsclient -c -F '((name . "org-agenda"))' -e "(progn (setq org-agenda-window-setup 'only-window)(org-agenda 0 \"b\"))"

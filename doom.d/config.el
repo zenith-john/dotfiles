@@ -16,13 +16,17 @@
   (setq ivy-magic-slash-non-match-action 'ivy-magic-slash-non-match-cd-selected))
 
 ;; Reconfigure company
-(after! company-mode
-  (map! :i "C-j" #'company-complete-common)
-  (setq-default company-idle-delay 0
-                company-minimum-prefix-length 2))
+(after! company
+  (setq company-idle-delay 0
+        company-minimum-prefix-length 2)
+  (map! :i "C-j" #'company-complete-common))
 
 ;; Reconfigure org
-(after! org                                                  
+(after! org
+
+  (add-hook! org-mode
+    (turn-off-smartparens-mode))
+
   (setq org-directory "~/Dropbox/"
         org-agenda-files '("~/Dropbox/")
         org-default-notes-file "~/Dropbox/refile.org")
@@ -32,7 +36,7 @@
         '((sequence "TODO(t)" "WAITING(w@/!)" "PAUSE(p)" "SOMEDAY(s)" "NEXT(n)" "|" "DONE(d!)" "CANCELLED(c@)")
           (sequence "[ ](T)" "[-](P)" "[?](m)" "|" "[X](D)")))
 
-   (setq org-todo-state-tags-triggers
+  (setq org-todo-state-tags-triggers
         '(("CANCELLED" ("CANCELLED" . t))
           ("WAITING" ("WAITING" . t))
           ("NEXT" ("WAITING" . nil) ("SOMEDAY" . nil))
@@ -42,13 +46,19 @@
           ("DONE" ("WAITING" . nil) ("TODO" . nil) ("SOMEDAY" . nil))
           ("SOMEDAY" ("TODO" . nil))))
 
+  ;; Org Capture
   (setq org-capture-templates
         '(("h" "Homework" entry (file+headline "~/Dropbox/task.org"  "Homework")
-           "* TODO %?\n%U\n%a\n")
+           "* TODO %?\n")
           ("s" "Schedule" entry (file+headline "~/Dropbox/task.org" "Schedule")
-           "* TODO %?\n%U\n%a\n")
+           "* TODO %?\n")
           ("p" "Project" entry (file+headline "~/Dropbox/task.org" "Project")
-           "* TODO %?\n%U\n%a\n")))
+           "* TODO %?\n")))
+
+  ;; Org tag
+  (setq org-tag-alist
+        '(("Improvement" . ?i) ("Homework" . ?h) ("Personal" . ?p)))
+
 
   ;; Org agenda settings
   (setq org-enable-table-editor 'optimized
@@ -62,6 +72,32 @@
         org-agenda-show-all-dates nil
         org-deadline-warning-days 365
         org-agenda-show-future-repeats nil)
+
+
+  (setq org-agenda-custom-commands
+        '(("b" "My Agenda View" (
+                                 (tags "AGENDAHEADER" ((org-agenda-overriding-header "Today's Schedule:")))
+                                 (agenda ""
+                                         ((org-agenda-show-all-dates t)
+                                          (org-agenda-span 'day)
+                                          (org-deadline-warning-days 6)
+                                          (org-agenda-start-day "+0d")))
+                                 (todo "NEXT"
+                                       ((org-agenda-overriding-header "========================================\nNext Tasks:")))
+                                 (tags "BEFOREWEEKGLANCE" ((org-agenda-overriding-header "========================================\nNext Week Glance:")))
+                                 (agenda ""
+                                         ((org-agenda-show-all-dates t)
+                                          (org-agenda-span 6)
+                                          (org-agenda-start-day "+1d")))
+                                 (tags-todo "Improvement/!-NEXT" ((org-agenda-overriding-header "========================================\nImprove Yourself:")))
+                                 (tags-todo "Personal/!-NEXT" ((org-agenda-overriding-header "\nPersonal Project:")))
+                                 (tags "BEFOREDEADLINE" ((org-agenda-overriding-header "========================================\nFar Away Tasks:")))
+                                 (agenda ""
+                                         ((org-agenda-span 180)
+                                          (org-agenda-time-grid nil)
+                                          (org-agenda-show-all-dates nil)
+                                          (org-agenda-entry-types '(:deadline :scheduled))
+                                          (org-agenda-start-day "+7d")))))))
 
   ;; Org latex export
   (setq org-latex-with-hyperref t)
@@ -95,7 +131,6 @@
 
 ;; Latex support
 (after! tex
-  (add-to-list '+latex-viewers 'evince)
   (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
   (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
   (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
@@ -105,5 +140,5 @@
   (setq-default TeX-engine 'xetex
                 TeX-show-compilation t)
   (add-to-list 'TeX-command-list
-     		   '("XeLaTeX" "xelatex -interaction=nonstopmode %s"
-		         TeX-run-command t t :help "Run xelatex") t))
+               '("XeLaTeX" "xelatex -interaction=nonstopmode %s"
+                 TeX-run-command t t :help "Run xelatex") t))
