@@ -11,6 +11,10 @@
       doom-localleader-key ", m"
       doom-localleader-alt-key "M-, m")
 
+(setq-default truncate-lines nil)
+
+(global-visual-line-mode)
+
 ;; Reconfigure ivy
 (after! ivy
   (setq ivy-magic-slash-non-match-action 'ivy-magic-slash-non-match-cd-selected))
@@ -24,8 +28,24 @@
 ;; Reconfigure org
 (after! org
 
+  ;; Make emphasis clear when using bold font
+  (add-to-list 'org-emphasis-alist
+               '("*" (:foreground "pink")))
+
   (add-hook! org-mode
-    (turn-off-smartparens-mode))
+    ;; Enable cdlatex mode
+    ;; TODO configure cdlatex-command-alist
+    (org-cdlatex-mode 1)
+    (setq truncate-lines nil))
+
+
+  ;; Make latex formulation more clear
+  (plist-put org-format-latex-options :scale 2)
+
+  (require 'org-edit-latex)
+
+  (remove-hook! org-mode
+    #'auto-fill-mode)
 
   (setq org-directory "~/Dropbox/"
         org-agenda-files '("~/Dropbox/")
@@ -80,7 +100,7 @@
                                  (agenda ""
                                          ((org-agenda-show-all-dates t)
                                           (org-agenda-span 'day)
-                                          (org-deadline-warning-days 6)
+                                          (org-deadline-warning-days 1)
                                           (org-agenda-start-day "+0d")))
                                  (todo "NEXT"
                                        ((org-agenda-overriding-header "========================================\nNext Tasks:")))
@@ -119,6 +139,19 @@
           ("" "multicol" t)
           ("" "amssymb" t)
           "\\tolerance=1000"))
+
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (latex . t)
+     (python . t)
+     (shell . t)))
+
+
+  (with-eval-after-load 'ox
+    (require 'ox-hugo))
+
+
   (eval-after-load 'ox-latex
     '(add-to-list 'org-latex-classes
                   '("ctexart"
@@ -139,6 +172,7 @@
   (setq reftex-bibliography-commands '("bibliography" "nobibiliography" "addbibresource"))
   (setq-default TeX-engine 'xetex
                 TeX-show-compilation t)
+
   (add-to-list 'TeX-command-list
                '("XeLaTeX" "xelatex -interaction=nonstopmode %s"
                  TeX-run-command t t :help "Run xelatex") t))

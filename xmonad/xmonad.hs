@@ -113,7 +113,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) =
     --  Reset the layouts on the current workspace to default
   , ((modm .|. shiftMask, xK_space), setLayout $ XMonad.layoutHook conf)
     -- Resize viewed windows to the correct size
-  , ((modm, xK_n), refresh)
+  -- , ((modm, xK_n), refresh)
     -- Move focus to the next window
   , ((modm, xK_Tab), nextMatch History (return True))
     -- Move focus to the next window
@@ -181,15 +181,17 @@ myAdditionalKeys =
   ("M-; f", runOrRaiseNext "firefox" (className =? "Firefox")),
   ("M-; e", runOrRaiseNext "emacs" (className =? "Emacs")),
   ("M-; p", runOrRaiseNext "charm" (className =? "jetbrains-pycharm")),
-  ("M-; m", runOrRaiseNext "mymatlab" (className =? "MATLAB R2018b - academic use")),
+  ("M-; m", namedScratchpadAction myScratchPads "mc"),
   ("M-; q", namedScratchpadAction myScratchPads "terminal"),
   ("M-; i", namedScratchpadAction myScratchPads "ipython"),
   ("M-; a", namedScratchpadAction myScratchPads "org-agenda"),
   ("M-; c", namedScratchpadAction myScratchPads "org-capture"),
   ("M-; n", namedScratchpadAction myScratchPads "org-note"),
-  ("M-; t", namedScratchpadAction myScratchPads "mail")
+  ("M-; t", namedScratchpadAction myScratchPads "mail"),
+  ("M-; v", namedScratchpadAction myScratchPads "volume")
   , ("<Print>", spawn "flameshot gui")
   , ("M-n", switchLayer)
+  , ("M-m", withFocused $ windows . W.sink)
   , ("M-i", sendMessage Shrink)
   , ("M-o", sendMessage Expand)
   , ("M-h", windowGo L True)
@@ -316,16 +318,21 @@ myManageHook =
 	("Et", "Office"),
         ("Evince", "View")]
 
+
 myScratchPads =
   [NS "terminal" "urxvtc -title scratchpad" (title =? "scratchpad") doTopFloat
    , NS "ipython" "urxvtc -title ipython -e ipython" (title =? "ipython") doTopLeftFloat
    , NS "org-agenda" "org-agenda" (title =? "org-agenda") doRightFloat
    , NS "org-capture" "org-capture" (title =? "org-capture") doRightFloat
    , NS "org-note" "org-note" (title =? "org-note") doRightFloat
-   , NS "mail" "thunderbird" (className =? "Thunderbird") doLeftFloat]
+   , NS "mail" "thunderbird" (className =? "Thunderbird") doLeftFloat
+   , NS "mc" "urxvtc -title mc -e mc" (prefixTitle "mc") doBottomLeftFloat
+   , NS "volume" "urxvtc -title alsa -e alsamixer" (title =? "alsa") doTopLeftFloat]
   where
+    prefixTitle prefix = fmap (prefix `isPrefixOf`) title
     doTopFloat = customFloating $ W.RationalRect (1/4) 0 (1/2) (1/2)
-    doTopLeftFloat = customFloating $ W.RationalRect 0 0 (1/3) (1/3)
+    doTopLeftFloat = customFloating $ W.RationalRect 0 0 (1/2) (1/2)
+    doBottomLeftFloat = customFloating $ W.RationalRect (0) (1/2) (1/2) (1/2)
     doLeftFloat = customFloating $ W.RationalRect 0 0 (1/2) 1
     doRightFloat = customFloating $ W.RationalRect (2/3) 0 (1/3) 1
 
@@ -366,7 +373,6 @@ myStartupHook = do
   spawn "setxkbmap -option ctrl:nocaps"
   spawn "stalonetray"
   spawn "sh -c \"nohup ~/.nutstore/dist/bin/nutstore-pydaemon.py >/dev/null 2>&1 &\""
-  spawn "volti"
   spawn "xscreensaver"
   spawn "caffeine-indicator"
   spawn "nm-applet"

@@ -30,3 +30,5 @@ export PATH="/home/zenith-john/.cargo/bin/:/home/zenith-john/anaconda3/bin/:$PAT
 export PATH="$PATH:`yarn global bin`"
 
 [[ -s /home/zenith-john/App/amber18/amber.sh ]] && source /home/zenith-john/App/amber18/amber.sh
+
+export MC_XDG_OPEN=~/.local/bin/nohup-open

@@ -29,7 +29,7 @@ zstyle ':completion:*' menu select=1
 setopt AUTO_MENU
 setopt AUTO_CD
 setopt EXTENDED_GLOB
-setopt CORRECT
+#setopt CORRECT
 
 
 export EDITOR="myemacs"
@@ -38,6 +38,7 @@ eval $(dircolors -b)
 [ -f ~/.zplug/init.zsh ] || (curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh)
 source ~/.zplug/init.zsh
 
+zplug "supercrabtree/k"
 zplug "changyuheng/zsh-interactive-cd"
 zplug "zsh-users/zsh-syntax-highlighting"
 zplug "zsh-users/zsh-completions"
