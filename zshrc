@@ -32,7 +32,7 @@ setopt EXTENDED_GLOB
 #setopt CORRECT
 
 
-export EDITOR="myemacs"
+export EDITOR="emacsclient"
 eval $(dircolors -b)
 
 [ -f ~/.zplug/init.zsh ] || (curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh)
@@ -93,6 +93,14 @@ alias l='ls'
 if [ $+commands[fd] ]; then
 	alias find=fd
 fi
+
+# git alias
+alias gs="git status"
+alias gd="git diff"
+alias gp="git push"
+alias gpull="git pull"
+alias gc="git commit"
+alias ga="git add"
 
 # z.lua configuration
 eval "$(lua ~/.zplug/repos/skywind3000/z.lua/z.lua --init zsh)"

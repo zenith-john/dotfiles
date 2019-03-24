@@ -15,6 +15,22 @@
 
 (global-visual-line-mode)
 
+(def-package! keyfreq
+  :commands (keyfreq-mode keyfreq-show keyfreq-reset)
+  :config
+  (keyfreq-mode 1))
+
+(def-package! evil-nerd-commenter
+  :commands (evilnc-comment-or-uncomment-lines
+             comment-or-uncomment-region
+             evilnc-comment-operator)
+  :init
+  (map! :leader
+        :prefix "c"
+        "c" #'evilnc-comment-or-uncomment-lines
+        "R" #'comment-or-uncomment-region
+        "\\" #'evilnc-comment-operator))
+
 ;; Reconfigure ivy
 (after! ivy
   (setq ivy-magic-slash-non-match-action 'ivy-magic-slash-non-match-cd-selected))
@@ -23,7 +39,17 @@
 (after! company
   (setq company-idle-delay 0
         company-minimum-prefix-length 2)
+  (setq company-box-icons-alist 'company-box-icons-all-the-icons)
   (map! :i "C-j" #'company-complete-common))
+
+;; configure yasnippet disable tab expand
+(after! yasnippet
+  (map! :map yas-minor-mode-map
+        "<tab>" nil
+        "TAB" nil
+        :i
+        [tab] nil
+        "M-j" yas-maybe-expand))
 
 ;; Reconfigure org
 (after! org
@@ -100,7 +126,7 @@
                                  (agenda ""
                                          ((org-agenda-show-all-dates t)
                                           (org-agenda-span 'day)
-                                          (org-deadline-warning-days 1)
+                                          (org-deadline-warning-days 0)
                                           (org-agenda-start-day "+0d")))
                                  (todo "NEXT"
                                        ((org-agenda-overriding-header "========================================\nNext Tasks:")))

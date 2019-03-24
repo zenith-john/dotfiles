@@ -186,6 +186,7 @@ myAdditionalKeys =
   ("M-; i", namedScratchpadAction myScratchPads "ipython"),
   ("M-; a", namedScratchpadAction myScratchPads "org-agenda"),
   ("M-; c", namedScratchpadAction myScratchPads "org-capture"),
+  ("M-; d", namedScratchpadAction myScratchPads "zeal"),
   ("M-; n", namedScratchpadAction myScratchPads "org-note"),
   ("M-; t", namedScratchpadAction myScratchPads "mail"),
   ("M-; v", namedScratchpadAction myScratchPads "volume")
@@ -308,7 +309,7 @@ myManageHook =
       , "electronic-wechat"
       , "smplayer"
       ]
-    myFloat = ["Hangouts", "Gnome-terminal", "GoldenDict"]
+    myFloat = ["Hangouts", "Gnome-terminal", "GoldenDict", "Zeal"]
     myWorkspaceMove = [("Firefox", "Firefox"),
 	("jetbrains-pycharm", "PyCharm"),
 	("MATLAB R2018b - academic use", "Lab"),
@@ -316,6 +317,7 @@ myManageHook =
 	("Wpp", "Office"),
 	("Wps", "Office"),
 	("Et", "Office"),
+	("FoxitReader", "View"),
         ("Evince", "View")]
 
 
@@ -327,7 +329,8 @@ myScratchPads =
    , NS "org-note" "org-note" (title =? "org-note") doRightFloat
    , NS "mail" "thunderbird" (className =? "Thunderbird") doLeftFloat
    , NS "mc" "urxvtc -title mc -e mc" (prefixTitle "mc") doBottomLeftFloat
-   , NS "volume" "urxvtc -title alsa -e alsamixer" (title =? "alsa") doTopLeftFloat]
+   , NS "volume" "urxvtc -title alsa -e alsamixer" (title =? "alsa") doTopLeftFloat
+   , NS "zeal" "zeal" (className =? "Zeal") doTopLeftFloat]
   where
     prefixTitle prefix = fmap (prefix `isPrefixOf`) title
     doTopFloat = customFloating $ W.RationalRect (1/4) 0 (1/2) (1/2)

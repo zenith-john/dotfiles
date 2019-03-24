@@ -9,3 +9,6 @@
 (package! ox-hugo)
 (package! cdlatex)
 (package! org-edit-latex)
+(package! keyfreq)
+(package! evil-commentary :disable t)
+(package! evil-nerd-commenter)
