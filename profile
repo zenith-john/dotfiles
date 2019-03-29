@@ -32,3 +32,10 @@ export PATH="$PATH:`yarn global bin`"
 [[ -s /home/zenith-john/App/amber18/amber.sh ]] && source /home/zenith-john/App/amber18/amber.sh
 
 export MC_XDG_OPEN=~/.local/bin/nohup-open
+
+# when installing pdf-tools
+# avoid using the ananconda pkg-config
+export PKG_CONFIG=/usr/bin/pkg-config
+
+# export z.lua for ranger
+export RANGER_ZLUA=~/.zplug/repos/skywind3000/z.lua/z.lua

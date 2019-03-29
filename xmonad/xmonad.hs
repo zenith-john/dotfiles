@@ -148,7 +148,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) =
     -- Quit xmonad
   , ((modm .|. shiftMask, xK_c), io (exitWith ExitSuccess))
     -- Restart xmonad
-  , ((modm, xK_q), spawn "xmonad --recompile; xmonad --restart")
+  -- , ((modm, xK_q), spawn "xmonad --recompile; xmonad --restart")
     -- Run xmessage with a summary of the default keybindings (useful for beginners)
   , ( (modm .|. shiftMask, xK_slash)
     , spawn ("echo \"" ++ help ++ "\" | xmessage -file -"))
@@ -180,8 +180,7 @@ myAdditionalKeys =
   [
   ("M-; f", runOrRaiseNext "firefox" (className =? "Firefox")),
   ("M-; e", runOrRaiseNext "emacs" (className =? "Emacs")),
-  ("M-; p", runOrRaiseNext "charm" (className =? "jetbrains-pycharm")),
-  ("M-; m", namedScratchpadAction myScratchPads "mc"),
+  ("M-; r", namedScratchpadAction myScratchPads "ranger"),
   ("M-; q", namedScratchpadAction myScratchPads "terminal"),
   ("M-; i", namedScratchpadAction myScratchPads "ipython"),
   ("M-; a", namedScratchpadAction myScratchPads "org-agenda"),
@@ -320,6 +319,11 @@ myManageHook =
 	("FoxitReader", "View"),
         ("Evince", "View")]
 
+configuredRect::Rational->Rational->Rational->Rational->W.RationalRect
+configuredRect l t w h =
+  W.RationalRect l (t + height - t * height) w ((1 - height) * h)
+  where
+    height = (19 / 1080)
 
 myScratchPads =
   [NS "terminal" "urxvtc -title scratchpad" (title =? "scratchpad") doTopFloat
@@ -328,17 +332,16 @@ myScratchPads =
    , NS "org-capture" "org-capture" (title =? "org-capture") doRightFloat
    , NS "org-note" "org-note" (title =? "org-note") doRightFloat
    , NS "mail" "thunderbird" (className =? "Thunderbird") doLeftFloat
-   , NS "mc" "urxvtc -title mc -e mc" (prefixTitle "mc") doBottomLeftFloat
+   , NS "ranger" "urxvtc -title ranger -e ranger" (title =? "ranger") doBottomLeftFloat
    , NS "volume" "urxvtc -title alsa -e alsamixer" (title =? "alsa") doTopLeftFloat
    , NS "zeal" "zeal" (className =? "Zeal") doTopLeftFloat]
   where
     prefixTitle prefix = fmap (prefix `isPrefixOf`) title
-    doTopFloat = customFloating $ W.RationalRect (1/4) 0 (1/2) (1/2)
-    doTopLeftFloat = customFloating $ W.RationalRect 0 0 (1/2) (1/2)
-    doBottomLeftFloat = customFloating $ W.RationalRect (0) (1/2) (1/2) (1/2)
-    doLeftFloat = customFloating $ W.RationalRect 0 0 (1/2) 1
-    doRightFloat = customFloating $ W.RationalRect (2/3) 0 (1/3) 1
-
+    doTopFloat = customFloating $ configuredRect (1/4) 0 (1/2) (1/2)
+    doTopLeftFloat = customFloating $ configuredRect 0 0 (1/2) (1/2)
+    doBottomLeftFloat = customFloating $ configuredRect 0 (1/2) (1/2) (1/2)
+    doLeftFloat = customFloating $ configuredRect 0 0 (1/2) 1
+    doRightFloat = customFloating $ configuredRect (2/3) 0 (1/3) 1
 ------------------------------------------------------------------------
 -- Event handling
 -- * EwmhDesktops users should change this to ewmhDesktopsEventHook
@@ -371,6 +374,7 @@ myLogHook = do
 myStartupHook = do
   setWMName "LG3D"
   setDefaultCursor xC_pirate
+  docksStartupHook
   spawn "ibus-daemon --xim -r -d"
   spawn "feh --bg-scale /usr/share/backgrounds/Beaver_Wallpaper_Grey_4096x2304.png"
   spawn "setxkbmap -option ctrl:nocaps"
@@ -387,7 +391,7 @@ myStartupHook = do
 -- Run xmonad with the settings you specify. No need to modify this.
 --
 main =
-  xmonad =<< xmobar defaults
+  xmonad =<< xmobar (docks defaults)
 
 -- A structure containing your configuration settings, overriding
 -- fields in the default config. Any you don't override, will

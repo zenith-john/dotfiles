@@ -13,8 +13,6 @@
 
 (setq-default truncate-lines nil)
 
-(global-visual-line-mode)
-
 (def-package! keyfreq
   :commands (keyfreq-mode keyfreq-show keyfreq-reset)
   :config
@@ -25,15 +23,33 @@
              comment-or-uncomment-region
              evilnc-comment-operator)
   :init
+  (map! :nv
+        "gc" 'evilnc-comment-or-uncomment-lines)
   (map! :leader
         :prefix "c"
         "c" #'evilnc-comment-or-uncomment-lines
         "R" #'comment-or-uncomment-region
         "\\" #'evilnc-comment-operator))
 
+(def-package! interleave
+  :commands (interleave-mode)
+  :after pdf-tools
+  :config
+  (defun +maybe-interleave-quit ()
+    (interactive)
+    (if interleave-pdf-mode
+        (interleave-quit)
+      (kill-this-buffer)))
+  (map! :map pdf-view-mode-map :gn "q" #'+maybe-interleave-quit)
+  (map! :map pdf-view-mode-map :gn "i" #'interleave-add-note))
+
 ;; Reconfigure ivy
 (after! ivy
   (setq ivy-magic-slash-non-match-action 'ivy-magic-slash-non-match-cd-selected))
+
+;; Configure persp-mode
+(after! persp-mode
+  (setq persp-emacsclient-init-frame-behaviour-override nil))
 
 ;; Reconfigure company
 (after! company
@@ -61,6 +77,8 @@
   (add-hook! org-mode
     ;; Enable cdlatex mode
     ;; TODO configure cdlatex-command-alist
+    (visual-line-mode 1)
+    (display-line-numbers-mode 0)
     (org-cdlatex-mode 1)
     (setq truncate-lines nil))
 

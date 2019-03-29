@@ -1,2 +1,2 @@
 #!/bin/sh
-emacsclient -c -F '((name . "org-note"))' -e "(find-file \"~/Documents/Notes/Science.org\")"
+emacsclient -c -F '((name . "org-note"))' -e "(persp-switch \"Notes\")"

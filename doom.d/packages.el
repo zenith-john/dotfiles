@@ -11,4 +11,6 @@
 (package! org-edit-latex)
 (package! keyfreq)
 (package! evil-commentary :disable t)
+(package! emacs-snippets :disable t)
 (package! evil-nerd-commenter)
+(package! interleave)

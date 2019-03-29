@@ -39,7 +39,7 @@ eval $(dircolors -b)
 source ~/.zplug/init.zsh
 
 zplug "supercrabtree/k"
-zplug "changyuheng/zsh-interactive-cd"
+#zplug "changyuheng/zsh-interactive-cd"
 zplug "zsh-users/zsh-syntax-highlighting"
 zplug "zsh-users/zsh-completions"
 zplug "dannynimmo/punctual-zsh-theme", as:theme
