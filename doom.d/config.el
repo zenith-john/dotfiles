@@ -43,6 +43,23 @@
   (map! :map pdf-view-mode-map :gn "q" #'+maybe-interleave-quit)
   (map! :map pdf-view-mode-map :gn "i" #'interleave-add-note))
 
+(def-package! org-ref
+  :after org
+  :init
+  (setq org-ref-completion-library 'org-ref-ivy-cite)
+  (require 'org-ref)
+  :config
+  (setq org-ref-default-bibliography '("~/Dropbox/Library.bib")))
+
+(def-package! fd-dired
+  :commands (fd-dired)
+  :init
+  (evil-define-command +evil:fd (query)
+    "Ex interface for fd-dired"
+    (interactive "<a>")
+    (fd-dired (file-name-directory (buffer-file-name)) query))
+  (evil-ex-define-cmd "fd" #'+evil:fd))
+
 ;; Reconfigure ivy
 (after! ivy
   (setq ivy-magic-slash-non-match-action 'ivy-magic-slash-non-match-cd-selected))

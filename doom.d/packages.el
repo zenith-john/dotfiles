@@ -14,3 +14,5 @@
 (package! emacs-snippets :disable t)
 (package! evil-nerd-commenter)
 (package! interleave)
+(package! org-ref)
+(package! fd-dired :recipe (:fetcher github :repo "yqrashawn/fd-dired"))
