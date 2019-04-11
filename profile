@@ -35,6 +35,7 @@ export MC_XDG_OPEN=~/.local/bin/nohup-open
 
 # when installing pdf-tools
 # avoid using the ananconda pkg-config
+export PKG_CONFIG_PATH=/usr/bin
 export PKG_CONFIG=/usr/bin/pkg-config
 
 # export z.lua for ranger

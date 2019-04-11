@@ -12,6 +12,7 @@ import Data.Monoid
 import Data.List
 import XMonad
 
+import XMonad.Actions.CopyWindow
 import XMonad.Actions.FloatKeys
 import XMonad.Actions.FloatSnap
 import XMonad.Actions.GroupNavigation
@@ -89,7 +90,7 @@ myModMask = mod4Mask
 -- > workspaces = ["web", "irc", "code" ] ++ map show [4..9]
 --
 myWorkspaces =
-  ["Firefox", "Terminal", "Office", "Emacs", "Lab", "View", "Design", "PyCharm", "Mail"]
+  ["Web", "Terminal", "Office", "Emacs", "Lab", "View", "Design", "PyCharm", "Test"]
 
 -- Border colors for unfocused and focused windows, respectively.
 --
@@ -100,14 +101,18 @@ myFocusedBorderColor = "#ff0000"
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
 --
+toggleCopyToAll = wsContainingCopies >>= \ws -> case ws of
+         [] -> windows copyToAll
+         _  -> killAllOtherCopies
+
 myKeys conf@(XConfig {XMonad.modMask = modm}) =
   M.fromList $
     -- launch a terminal
   [ ((modm .|. shiftMask, xK_Return), spawn (myTerminal ++ " -e one-tmux"))
     -- launch dmenu
-  , ((modm, xK_p), spawn "dmenu_run")
+  , ((modm, xK_p), spawn "rofi -sort -matching fuzzy -show run")
     -- close focused window
-  , ((modm .|. shiftMask, xK_q), kill)
+  , ((modm .|. shiftMask, xK_q), kill1)
      -- Rotate through the available layout algorithms
   , ((modm, xK_space), sendMessage NextLayout)
     --  Reset the layouts on the current workspace to default
@@ -115,7 +120,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) =
     -- Resize viewed windows to the correct size
   -- , ((modm, xK_n), refresh)
     -- Move focus to the next window
-  , ((modm, xK_Tab), nextMatch History (return True))
+  -- , ((modm, xK_Tab), nextMatch History (return True))
     -- Move focus to the next window
   -- , ((modm, xK_j), windows W.focusDown)
     -- Move focus to the previous window
@@ -178,7 +183,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) =
 
 myAdditionalKeys =
   [
-  ("M-; f", runOrRaiseNext "firefox" (className =? "Firefox")),
+  ("M-; f", runOrCopy "firefox" (className =? "Firefox")),
   ("M-; e", runOrRaiseNext "emacs" (className =? "Emacs")),
   ("M-; r", namedScratchpadAction myScratchPads "ranger"),
   ("M-; q", namedScratchpadAction myScratchPads "terminal"),
@@ -188,10 +193,13 @@ myAdditionalKeys =
   ("M-; d", namedScratchpadAction myScratchPads "zeal"),
   ("M-; n", namedScratchpadAction myScratchPads "org-note"),
   ("M-; t", namedScratchpadAction myScratchPads "mail"),
-  ("M-; v", namedScratchpadAction myScratchPads "volume")
+  ("M-; v", namedScratchpadAction myScratchPads "volume"),
+  ("M-; w", namedScratchpadAction myScratchPads "writefull"),
+  ("M-; p", spawn "rofi -sort -matching fuzzy -show file -modi file:\"rofi-file-browser $HOME/Documentation\"")
   , ("<Print>", spawn "flameshot gui")
+  , ("M-d", toggleCopyToAll)
   , ("M-n", switchLayer)
-  , ("M-m", withFocused $ windows . W.sink)
+  , ("M-t", withFocused $ windows . W.sink)
   , ("M-i", sendMessage Shrink)
   , ("M-o", sendMessage Expand)
   , ("M-h", windowGo L True)
@@ -246,9 +254,10 @@ myLayout = avoidStruts $ (tiled ||| full)
         --Layouts
   where
     tiled = named "tile" $ smartBorders (ResizableTall 1 (2 / 100) (1 / 2) [])
-    --mtile     = named "mtile" $ Mirror tiled
+    -- mtile     = named "mtile" $ Mirror tiled
     -- tab = named "tab" $ noBorders $ tabbed shrinkText tabConfig
-    full = named "full" $ noBorders Full--grid      = named "grid" $ smartBorders(Grid)
+    full = named "full" $ noBorders Full
+    -- grid      = named "grid" $ smartBorders(Grid)
 
 tabConfig =
   def
@@ -258,7 +267,7 @@ tabConfig =
     , inactiveBorderColor = "#7C7C7C"
     , inactiveTextColor = "#EEEEEE"
     , inactiveColor = "#000000"
-    , fontName = "xft:Noto Sans CJK:size=10:antialias=true"
+    , fontName = "xft:Sarasa Mono SC-10:bold"
     }
 
 ------------------------------------------------------------------------
@@ -309,7 +318,7 @@ myManageHook =
       , "smplayer"
       ]
     myFloat = ["Hangouts", "Gnome-terminal", "GoldenDict", "Zeal"]
-    myWorkspaceMove = [("Firefox", "Firefox"),
+    myWorkspaceMove = [("Firefox", "Web"),
 	("jetbrains-pycharm", "PyCharm"),
 	("MATLAB R2018b - academic use", "Lab"),
         ("MATLAB R2018b", "Lab"),
@@ -334,7 +343,8 @@ myScratchPads =
    , NS "mail" "thunderbird" (className =? "Thunderbird") doLeftFloat
    , NS "ranger" "urxvtc -title ranger -e ranger" (title =? "ranger") doBottomLeftFloat
    , NS "volume" "urxvtc -title alsa -e alsamixer" (title =? "alsa") doTopLeftFloat
-   , NS "zeal" "zeal" (className =? "Zeal") doTopLeftFloat]
+   , NS "zeal" "zeal" (className =? "Zeal") doTopLeftFloat
+   , NS "writefull" "writefull" (className =? "Writefull") doTopLeftFloat]
   where
     prefixTitle prefix = fmap (prefix `isPrefixOf`) title
     doTopFloat = customFloating $ configuredRect (1/4) 0 (1/2) (1/2)
@@ -374,24 +384,13 @@ myLogHook = do
 myStartupHook = do
   setWMName "LG3D"
   setDefaultCursor xC_pirate
-  docksStartupHook
-  spawn "ibus-daemon --xim -r -d"
-  spawn "feh --bg-scale /usr/share/backgrounds/Beaver_Wallpaper_Grey_4096x2304.png"
-  spawn "setxkbmap -option ctrl:nocaps"
-  spawn "stalonetray"
-  spawn "sh -c \"nohup ~/.nutstore/dist/bin/nutstore-pydaemon.py >/dev/null 2>&1 &\""
-  spawn "xscreensaver"
-  spawn "caffeine-indicator"
-  spawn "nm-applet"
-  spawn "urxvtd"
-  spawn "xcompmgr"
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.
 -- Run xmonad with the settings you specify. No need to modify this.
 --
 main =
-  xmonad =<< xmobar (docks defaults)
+  xmonad =<< xmobar (docks $ defaults)
 
 -- A structure containing your configuration settings, overriding
 -- fields in the default config. Any you don't override, will
