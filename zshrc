@@ -32,7 +32,7 @@ setopt EXTENDED_GLOB
 #setopt CORRECT
 fpath+=~/.zfunc
 
-export EDITOR="emacsclient -c -n"
+export EDITOR="emacsclient -c"
 eval $(dircolors -b)
 
 [ -f ~/.zplug/init.zsh ] || (curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh)
