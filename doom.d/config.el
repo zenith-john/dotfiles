@@ -13,52 +13,103 @@
 
 (setq-default truncate-lines nil)
 
+(def-package! ox-hugo
+  :after ox
+  :init
+  (require 'ox-hugo))
+
+(def-package! cdlatex
+  :commands (org-cdlatex-mode)
+  :after org
+  :init
+  (add-hook! org-mode
+    (org-cdlatex-mode 1))
+  (add-hook! latex-mode
+    (cdlatex-mode 1)))
+
+(def-package! org-edit-latex
+  :after org
+  :init
+  (require 'org-edit-latex))
+
 (def-package! keyfreq
   :commands (keyfreq-mode keyfreq-show keyfreq-reset)
   :config
   (keyfreq-mode 1))
 
-(def-package! evil-nerd-commenter
-  :commands (evilnc-comment-or-uncomment-lines
-             comment-or-uncomment-region
-             evilnc-comment-operator)
-  :init
-  (map! :nv
-        "gc" 'evilnc-comment-or-uncomment-lines)
-  (map! :leader
-        :prefix "c"
-        "c" #'evilnc-comment-or-uncomment-lines
-        "R" #'comment-or-uncomment-region
-        "\\" #'evilnc-comment-operator))
-
-(def-package! interleave
-  :commands (interleave-mode)
+(def-package! org-noter
+  :commands (org-noter)
   :after pdf-tools
   :config
-  (defun +maybe-interleave-quit ()
-    (interactive)
-    (if interleave-pdf-mode
-        (interleave-quit)
-      (kill-this-buffer)))
-  (map! :map pdf-view-mode-map :gn "q" #'+maybe-interleave-quit)
-  (map! :map pdf-view-mode-map :gn "i" #'interleave-add-note))
+  ;; Overriding the function due to make visual-line mode no effect.
+  (defun org-noter--set-notes-scroll (window &rest ignored)
+    nil)
+  (setq org-noter-always-create-frame t)
+  (map! :map pdf-view-mode-map :gn "q" #'org-noter-kill-session)
+  (map! :map pdf-view-mode-map :gn "i" #'org-noter-insert-note))
+
+(def-package! ms-python
+  :init
+  (setq ms-python-server-install-dir (concat doom-private-dir "third_party/python-language-server/output/bin/Release/"))
+  (add-hook! python-mode (lsp)))
 
 (def-package! org-ref
   :after org
   :init
-  (setq org-ref-completion-library 'org-ref-ivy-cite)
-  (require 'org-ref)
+  (require 'bibtex-completion)
+  (setq org-ref-completion-library 'org-ref-reftex)
+  (defhydra org-ref-cite-hydra (:color blue)
+    "
+_p_: Open pdf     _w_: WOS          _g_: Google Scholar _K_: Copy citation to clipboard
+_u_: Open url     _r_: WOS related  _P_: Pubmed         _k_: Copy key to clipboard
+_n_: Open notes   _c_: WOS citing   _C_: Crossref       _f_: Copy formatted entry
+_o_: Open entry   _e_: Email entry  ^ ^                 _q_: quit
+"
+    ("o" org-ref-open-citation-at-point nil)
+    ("p" org-ref-open-pdf-at-point nil)
+    ("n" org-ref-open-notes-at-point nil)
+    ("u" org-ref-open-url-at-point nil)
+    ("w" org-ref-wos-at-point nil)
+    ("r" org-ref-wos-related-at-point nil)
+    ("c" org-ref-wos-citing-at-point nil)
+    ("g" org-ref-google-scholar-at-point nil)
+    ("P" org-ref-pubmed-at-point nil)
+    ("C" org-ref-crossref-at-point nil)
+    ("K" org-ref-copy-entry-as-summary nil)
+    ("k" (progn
+	       (kill-new
+	        (car (org-ref-get-bibtex-key-and-file))))
+     nil)
+    ("f" (kill-new
+	      (org-ref-format-entry (org-ref-get-bibtex-key-under-cursor)))
+     nil)
+
+    ("e" (kill-new (save-excursion
+		             (org-ref-open-citation-at-point)
+		             (org-ref-email-bibtex-entry)))
+     nil)
+    ("q" nil))
   :config
-  (setq org-ref-default-bibliography '("~/Dropbox/Library.bib")))
+  (setq org-ref-cite-onclick-function (lambda (_) (org-ref-cite-hydra/body)))
+  (setq org-ref-pdf-directory "~/Documents/Library/")
+  (setq org-ref-default-bibliography '("~/Dropbox/Library.bib"))
+
+  ;; Make citation work
+  (setq org-latex-pdf-process
+        '("%latex -interaction nonstopmode -output-directory %o %f"
+	      "biber %b"
+	      "%latex -interaction nonstopmode -output-directory %o %f"
+	      "%latex -interaction nonstopmode -output-directory %o %f")))
 
 (def-package! fd-dired
   :commands (fd-dired)
   :init
-  (evil-define-command +evil:fd (query)
-    "Ex interface for fd-dired"
-    (interactive "<a>")
-    (fd-dired (file-name-directory (buffer-file-name)) query))
-  (evil-ex-define-cmd "fd" #'+evil:fd))
+  (when (executable-find "fd")
+      (evil-define-command +evil:fd (query)
+        "Ex interface for fd-dired"
+        (interactive "<a>")
+        (fd-dired (file-name-directory (buffer-file-name)) query))
+      (evil-ex-define-cmd "fd" #'+evil:fd)))
 
 ;; Reconfigure ivy
 (after! ivy
@@ -75,38 +126,71 @@
   (setq company-box-icons-alist 'company-box-icons-all-the-icons)
   (map! :i "C-j" #'company-complete-common))
 
+(after! lsp-ui
+  (setq lsp-ui-doc-use-childframe t
+        lsp-ui-doc-use-webkit t
+        lsp-ui-doc-max-width 50
+        lsp-ui-doc-max-height 30
+        lsp-ui-doc-position 'at-point)
+  (setq-default lsp-ui-doc-frame-parameters
+                '((left . -1)
+                  (top . -1)
+                  (no-accept-focus . t)
+                  (min-width . 0)
+                  (width . 0)
+                  (min-height . 0)
+                  (height . 0)
+                  (internal-border-width . 0)
+                  (vertical-scroll-bars)
+                  (horizontal-scroll-bars)
+                  (left-fringe . 0)
+                  (right-fringe . 0)
+                  (menu-bar-lines . 0)
+                  (tool-bar-lines . 0)
+                  (line-spacing . 0.1)
+                  (unsplittable . t)
+                  (undecorated . t)
+                  (minibuffer . nil)
+                  (visibility . nil)
+                  (mouse-wheel-frame . nil)
+                  (no-other-frame . t)
+                  (cursor-type)
+                  (no-special-glyphs . t))))
+
 ;; configure yasnippet disable tab expand
 (after! yasnippet
   (map! :map yas-minor-mode-map
         "<tab>" nil
         "TAB" nil
         :i
-        [tab] nil
         "M-j" yas-maybe-expand))
 
 ;; Reconfigure org
 (after! org
 
+  (add-hook! org-mode
+    ;; Enable cdlatex mode
+    ;; TODO configure cdlatex-command-alist
+    (setq-local company-idle-delay nil)
+    (flycheck-mode 0)
+    (visual-line-mode 1)
+    (display-line-numbers-mode 0)
+    (LaTeX-math-mode 1)
+    (setq truncate-lines nil))
+
+  (remove-hook! org-mode
+    #'auto-fill-mode)
+
   ;; Make emphasis clear when using bold font
   (add-to-list 'org-emphasis-alist
                '("*" (:foreground "pink")))
 
-  (add-hook! org-mode
-    ;; Enable cdlatex mode
-    ;; TODO configure cdlatex-command-alist
-    (visual-line-mode 1)
-    (display-line-numbers-mode 0)
-    (org-cdlatex-mode 1)
-    (setq truncate-lines nil))
-
+  (setf org-highlight-latex-and-related '(latex))
 
   ;; Make latex formulation more clear
   (plist-put org-format-latex-options :scale 2)
 
   (require 'org-edit-latex)
-
-  (remove-hook! org-mode
-    #'auto-fill-mode)
 
   (setq org-directory "~/Dropbox/"
         org-agenda-files '("~/Dropbox/")
@@ -128,17 +212,47 @@
           ("SOMEDAY" ("TODO" . nil))))
 
   ;; Org Capture
+  (require 'org-protocol)
+
+  (defun transform-square-brackets-to-round-ones(string-to-transform)
+    "Transforms [ into ( and ] into ), other chars left unchanged."
+    (concat
+     (mapcar #'(lambda (c) (if (equal c ?[) ?\( (if (equal c ?]) ?\) c))) string-to-transform)))
+
   (setq org-capture-templates
-        '(("h" "Homework" entry (file+headline "~/Dropbox/task.org"  "Homework")
-           "* TODO %?\n")
+        '(("p" "Protocol" entry (file+headline "~/Documents/Notes/notes.org" "Bookmarks")
+           "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+	      ("L" "Protocol Link" entry (file+headline "~/Documents/Notes/notes.org" "Bookmarks")
+           "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")
+          ("h" "Homework" entry (file+headline "~/Dropbox/task.org"  "Homework")
+           "* TODO %? :Homework:\n")
           ("s" "Schedule" entry (file+headline "~/Dropbox/task.org" "Schedule")
            "* TODO %?\n")
-          ("p" "Project" entry (file+headline "~/Dropbox/task.org" "Project")
-           "* TODO %?\n")))
+          ("r" "Project" entry (file+headline "~/Dropbox/task.org" "Project")
+           "* TODO %?\n")
+          ("q" "Question" entry (file+headline "~/Dropbox/task.org" "Question")
+           "* TODO %? :Question:\n")
+          ("d" "Idea" entry (file+headline "~/Dropbox/task.org" "Idea")
+           "* TODO %? :Idea:\n")))
 
+  ;; For org-protocol from https://github.com/sprig/org-capture-extension
+  (defvar kk/delete-frame-after-capture 0 "Whether to delete the last frame after the current capture")
+
+  (defun kk/delete-frame-if-neccessary (&rest r)
+    (cond
+     ((= kk/delete-frame-after-capture 0) nil)
+     ((> kk/delete-frame-after-capture 1)
+      (setq kk/delete-frame-after-capture (- kk/delete-frame-after-capture 1)))
+     (t
+      (setq kk/delete-frame-after-capture 0)
+      (delete-frame))))
+
+  (advice-add 'org-capture-finalize :after 'kk/delete-frame-if-neccessary)
+  (advice-add 'org-capture-kill :after 'kk/delete-frame-if-neccessary)
+  (advice-add 'org-capture-refile :after 'kk/delete-frame-if-neccessary)
   ;; Org tag
   (setq org-tag-alist
-        '(("Improvement" . ?i) ("Homework" . ?h) ("Personal" . ?p)))
+        '(("Improvement" . ?i) ("Homework" . ?h) ("Personal" . ?p) ("Question" . ?q) ("Idea" . ?d)))
 
 
   ;; Org agenda settings
@@ -156,8 +270,9 @@
 
 
   (setq org-agenda-custom-commands
-        '(("b" "My Agenda View" (
-                                 (tags "AGENDAHEADER" ((org-agenda-overriding-header "Today's Schedule:")))
+        '(("b" "My Agenda View" ((tags-todo "Question/!-Waiting/!-Pause"
+                                       ((org-agenda-overriding-header "Unsolved Questions:")))
+                                 (tags "AGENDAHEADER" ((org-agenda-overriding-header "========================================\nToday's Schedule:")))
                                  (agenda ""
                                          ((org-agenda-show-all-dates t)
                                           (org-agenda-span 'day)
@@ -171,7 +286,7 @@
                                           (org-agenda-span 6)
                                           (org-agenda-start-day "+1d")))
                                  (tags-todo "Improvement/!-NEXT" ((org-agenda-overriding-header "========================================\nImprove Yourself:")))
-                                 (tags-todo "Personal/!-NEXT" ((org-agenda-overriding-header "\nPersonal Project:")))
+                                 (tags-todo "Idea+TODO<>\"NEXT\"|Personal+TODO<>\"NEXT\"" ((org-agenda-overriding-header "\nPersonal Project:")))
                                  (tags "BEFOREDEADLINE" ((org-agenda-overriding-header "========================================\nFar Away Tasks:")))
                                  (agenda ""
                                          ((org-agenda-span 180)
@@ -208,9 +323,6 @@
      (python . t)
      (shell . t)))
 
-
-  (with-eval-after-load 'ox
-    (require 'ox-hugo))
 
 
   (eval-after-load 'ox-latex

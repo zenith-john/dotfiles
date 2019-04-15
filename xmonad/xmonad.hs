@@ -13,6 +13,10 @@ import Data.List
 import XMonad
 
 import XMonad.Actions.CopyWindow
+import XMonad.Actions.CycleWS
+import XMonad.Actions.DynamicProjects (Project(..), dynamicProjects, shiftToProjectPrompt, switchProjectPrompt)
+import XMonad.Actions.DynamicWorkspaces
+import qualified XMonad.Actions.FlexibleManipulate as Flex
 import XMonad.Actions.FloatKeys
 import XMonad.Actions.FloatSnap
 import XMonad.Actions.GroupNavigation
@@ -42,6 +46,8 @@ import XMonad.Layout.ResizableTile
 import XMonad.Layout.Tabbed
 import XMonad.Layout.TwoPane
 
+import XMonad.Prompt
+
 import XMonad.Util.Cursor
 import XMonad.Util.EZConfig
 import XMonad.Util.NamedScratchpad
@@ -49,6 +55,7 @@ import XMonad.Util.NamedWindows
 import XMonad.Util.NamedScratchpad
 import XMonad.Util.Run (spawnPipe)
 import XMonad.Util.SpawnOnce
+import XMonad.Util.WorkspaceCompare
 
 import Graphics.X11.ExtraTypes.XF86
 import System.Exit
@@ -89,14 +96,42 @@ myModMask = mod4Mask
 --
 -- > workspaces = ["web", "irc", "code" ] ++ map show [4..9]
 --
-myWorkspaces =
-  ["Web", "Terminal", "Office", "Emacs", "Lab", "View", "Design", "PyCharm", "Test"]
+-- myWorkspaces =
+--   ["Web", "Terminal", "Office", "Emacs", "Lab", "View", "Design", "PyCharm", "Test"]
 
+myProjects :: [Project]
+myProjects =
+  [ Project "web" "~" . Just $ spawn "firefox",
+    Project "term" "~" . Just $ spawn (myTerminal ++ " -e one-tmux"),
+    Project "emacs" "~" . Just $ spawn "emacs",
+    Project "py" "~" Nothing,
+    Project "view" "~" Nothing,
+    Project "matlab" "~" Nothing,
+    Project "gimp" "/tmp" . Just $ spawn "gimp",
+    Project "inkscape" "/tmp" . Just $ spawn "inkscape"
+  ]
+
+myWorkspaces = map projectName myProjects
 -- Border colors for unfocused and focused windows, respectively.
 --
 myNormalBorderColor = "#7c7c7c"
 
 myFocusedBorderColor = "#ff0000"
+
+base03 ="#002b36"
+active = "#268bd2"
+
+myPromptTheme = def
+    { font                  = "xft:Sarasa Mono SC-10:bold"
+    , bgColor               = base03
+    , fgColor               = active
+    , fgHLight              = base03
+    , bgHLight              = active
+    , borderColor           = base03
+    , promptBorderWidth     = 0
+    , height                = 20
+    , position              = Top
+    }
 
 ------------------------------------------------------------------------
 -- Key bindings. Add, modify or remove key bindings here.
@@ -142,9 +177,9 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) =
     -- Push window back into tiling
   , ((modm, xK_t), withFocused $ windows . W.sink)
     -- Increment the number of windows in the master area
-  , ((modm, xK_comma), sendMessage (IncMasterN 1))
+  -- , ((modm, xK_comma), sendMessage (IncMasterN 1))
     -- Deincrement the number of windows in the master area
-  , ((modm, xK_period), sendMessage (IncMasterN (-1)))
+  -- , ((modm, xK_period), sendMessage (IncMasterN (-1)))
     -- Toggle the status bar gap
     -- Use this binding with avoidStruts from Hooks.ManageDocks.
     -- See also the statusBar function from Hooks.DynamicLog.
@@ -163,28 +198,44 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) =
   , ((0, xF86XK_AudioLowerVolume), spawn "amixer -q set Master 5%-")
     -- Increase volume.
   , ((0, xF86XK_AudioRaiseVolume), spawn "amixer -q set Master 5%+")
-  ] ++
+  ]
+   ++
+   zip (zip (repeat (modm)) [xK_1..xK_9]) (map (withNthWorkspace W.greedyView) [0..])
+   ++
+   zip (zip (repeat (modm .|. shiftMask)) [xK_1..xK_9]) (map (withNthWorkspace W.shift) [0..])
     --
     -- mod-[1..9], Switch to workspace N
     -- mod-shift-[1..9], Move client to workspace N
     --
-  [ ((m .|. modm, k), windows $ f i)
-  | (i, k) <- zip (XMonad.workspaces conf) [xK_1 .. xK_9]
-  , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]
-  ] ++
+  -- [ ((m .|. modm, k), windows $ f i)
+  --  | (i, k) <- zip (XMonad.workspaces conf) [xK_1 .. xK_9]
+  --  , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]
+  -- ] ++
     --
     -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
     -- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
     --
-  [ ((m .|. modm, key), screenWorkspace sc >>= flip whenJust (windows . f))
-  | (key, sc) <- zip [xK_w, xK_e, xK_r] [0 ..]
-  , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]
-  ]
+  -- [ ((m .|. modm, key), screenWorkspace sc >>= flip whenJust (windows . f))
+  -- | (key, sc) <- zip [xK_w, xK_e, xK_r] [0 ..]
+  -- , (f, m) <- [(W.view, 0), (W.shift, shiftMask)]
+  -- ]
+
+nextNonEmptyWS = findWorkspace getSortByIndexNoSP Next HiddenNonEmptyWS 1
+        >>= \t -> (windows . W.view $ t)
+prevNonEmptyWS = findWorkspace getSortByIndexNoSP Prev HiddenNonEmptyWS 1
+        >>= \t -> (windows . W.view $ t)
+getSortByIndexNoSP =
+        fmap (.namedScratchpadFilterOutWorkspace) getSortByIndex
 
 myAdditionalKeys =
   [
-  ("M-; f", runOrCopy "firefox" (className =? "Firefox")),
-  ("M-; e", runOrRaiseNext "emacs" (className =? "Emacs")),
+  ("M-,",  switchProjectPrompt myPromptTheme),
+  ("M-S-,", shiftToProjectPrompt myPromptTheme),
+  ("M-.", nextNonEmptyWS),
+  ("M-S-.", prevNonEmptyWS),
+  ("M-u", toggleWS' ["NSP"]),
+  ("M-<", sendMessage (IncMasterN 1)),
+  ("M->", sendMessage (IncMasterN (-1))),
   ("M-; r", namedScratchpadAction myScratchPads "ranger"),
   ("M-; q", namedScratchpadAction myScratchPads "terminal"),
   ("M-; i", namedScratchpadAction myScratchPads "ipython"),
@@ -202,10 +253,10 @@ myAdditionalKeys =
   , ("M-t", withFocused $ windows . W.sink)
   , ("M-i", sendMessage Shrink)
   , ("M-o", sendMessage Expand)
-  , ("M-h", windowGo L True)
+  , ("M-h", bindOn LD [("tab", windows W.focusUp),("", windowGo L True)])
   , ("M-j", windowGo D True)
   , ("M-k", windowGo U True)
-  , ("M-l", windowGo R True)
+  , ("M-l", bindOn LD [("tab", windows W.focusDown),("", windowGo R True)])
   , ("M-S-<L>", withFocused (keysResizeWindow (-30,0) (0,0))) --shrink float at right
   , ("M-S-<R>", withFocused (keysResizeWindow (30,0) (0,0))) --expand float at right
   , ("M-S-<D>", withFocused (keysResizeWindow (0,30) (0,0))) --expand float at bottom
@@ -231,12 +282,14 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) =
   M.fromList $
     -- mod-button1, Set the window to floating mode and move by dragging
   [ ( (modm, button1)
-    , (\w -> focus w >> mouseMoveWindow w >> windows W.shiftMaster))
+    , (\w -> focus w >> Flex.mouseWindow Flex.position w))
     -- mod-button2, Raise the window to the top of the stack
-  , ((modm, button2), (\w -> focus w >> windows W.shiftMaster))
+  , ((modm, button2), (\w -> focus w >> Flex.mouseWindow Flex.linear w))
     -- mod-button3, Set the window to floating mode and resize by dragging
-  , ( (modm, button3)
-    , (\w -> focus w >> mouseResizeWindow w >> windows W.shiftMaster))
+
+  , ((modm, button3), (\w -> focus w >> Flex.mouseWindow Flex.resize w))
+  -- , ( (modm, button3)
+  -- , (\w -> focus w >> mouseResizeWindow w >> windows W.shiftMaster))
     -- you may also bind events to the mouse scroll wheel (button4 and button5)
   ]
 
@@ -250,12 +303,12 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) =
 -- The available layouts.  Note that each layout is separated by |||,
 -- which denotes layout choice.
 --
-myLayout = avoidStruts $ (tiled ||| full)
+myLayout = avoidStruts $ (tiled ||| tab ||| full)
         --Layouts
   where
     tiled = named "tile" $ smartBorders (ResizableTall 1 (2 / 100) (1 / 2) [])
     -- mtile     = named "mtile" $ Mirror tiled
-    -- tab = named "tab" $ noBorders $ tabbed shrinkText tabConfig
+    tab = named "tab" $ noBorders $ tabbed shrinkText tabConfig
     full = named "full" $ noBorders Full
     -- grid      = named "grid" $ smartBorders(Grid)
 
@@ -298,8 +351,7 @@ myManageHook =
   [className =? r --> viewShift wsp | (r, wsp) <- myWorkspaceMove] ++
   -- fulscreen windows to fullfloating
   [isFullscreen --> doFullFloat] ++
-  -- emacs
-  [prefixTitle "emacs" --> viewShift "Emacs"]
+  [title  =? "urxvt" --> doCenterFloat]
   )
         -- windows to operate
   <+> namedScratchpadManageHook myScratchPads
@@ -316,17 +368,18 @@ myManageHook =
       , "wine"
       , "electronic-wechat"
       , "smplayer"
+      , "flameshot"
       ]
     myFloat = ["Hangouts", "Gnome-terminal", "GoldenDict", "Zeal"]
-    myWorkspaceMove = [("Firefox", "Web"),
-	("jetbrains-pycharm", "PyCharm"),
-	("MATLAB R2018b - academic use", "Lab"),
-        ("MATLAB R2018b", "Lab"),
-	("Wpp", "Office"),
-	("Wps", "Office"),
-	("Et", "Office"),
-	("FoxitReader", "View"),
-        ("Evince", "View")]
+    myWorkspaceMove = [("Firefox", "web"),
+	("jetbrains-pycharm", "py"),
+	("MATLAB R2018b - academic use", "matlab"),
+        ("MATLAB R2018b", "matlab"),
+	("Wpp", "office"),
+	("Wps", "office"),
+	("Et", "office"),
+	("FoxitReader", "view"),
+        ("Evince", "view")]
 
 configuredRect::Rational->Rational->Rational->Rational->W.RationalRect
 configuredRect l t w h =
@@ -390,7 +443,7 @@ myStartupHook = do
 -- Run xmonad with the settings you specify. No need to modify this.
 --
 main =
-  xmonad =<< xmobar (docks $ defaults)
+  xmonad =<< xmobar (docks . dynamicProjects myProjects $ defaults)
 
 -- A structure containing your configuration settings, overriding
 -- fields in the default config. Any you don't override, will
@@ -474,3 +527,25 @@ help =
     , "mod-button2  Raise the window to the top of the stack"
     , "mod-button3  Set the window to floating mode and resize by dragging"
     ]
+
+--- XMonad.Actions.ConditionalKeys
+
+data XCond = WS | LD
+
+-- | Choose an action based on the current workspace id (WS) or
+-- layout description (LD).
+chooseAction :: XCond -> (String->X()) -> X()
+chooseAction WS f = withWindowSet (f . W.currentTag)
+chooseAction LD f = withWindowSet (f . description . W.layout . W.workspace . W.current)
+
+
+-- | If current workspace or layout string is listed, run the associated
+-- action (only the first match counts!) If it isn't listed, then run the default
+-- action (marked with empty string, \"\"), or do nothing if default isn't supplied.
+bindOn :: XCond -> [(String, X())] -> X()
+bindOn xc bindings = chooseAction xc $ chooser where
+    chooser xc = case find ((xc==).fst) bindings of
+            Just (_, action) -> action
+            Nothing -> case find ((""==).fst) bindings of
+                                Just (_, action) -> action
+                                Nothing -> return ()

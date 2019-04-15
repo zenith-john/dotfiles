@@ -27,7 +27,14 @@ if [ -d "$HOME/.local/bin" ] ; then
 fi
 
 export PATH="/home/zenith-john/.cargo/bin/:/home/zenith-john/anaconda3/bin/:$PATH"
-export PATH="$PATH:`yarn global bin`"
+
+
+# Unset manpath so we can inherit from /etc/manpath via the `manpath` command
+unset MANPATH # delete if you already modified MANPATH elsewhere in your config
+export MANPATH="$NPM_PACKAGES/share/man:$(manpath)"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 
 [[ -s /home/zenith-john/App/amber18/amber.sh ]] && source /home/zenith-john/App/amber18/amber.sh
 
