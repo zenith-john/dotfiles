@@ -44,7 +44,9 @@
   ;; Overriding the function due to make visual-line mode no effect.
   (defun org-noter--set-notes-scroll (window &rest ignored)
     nil)
-  (setq org-noter-always-create-frame t)
+  (setq org-noter-always-create-frame nil
+        org-noter-kill-frame-at-session-end nil)
+  (map! :map pdf-view-mode-map :gn "C-i" #'org-noter-insert-note-toggle-no-questions)
   (map! :map pdf-view-mode-map :gn "q" #'org-noter-kill-session)
   (map! :map pdf-view-mode-map :gn "i" #'org-noter-insert-note))
 
@@ -111,6 +113,24 @@ _o_: Open entry   _e_: Email entry  ^ ^                 _q_: quit
         (fd-dired (file-name-directory (buffer-file-name)) query))
       (evil-ex-define-cmd "fd" #'+evil:fd)))
 
+;; Add hook for change input method
+(after! evil
+  (defvar +zenith/previous-input-method nil "The previous input method")
+  (defvar +zenith/english-input-method "xkb:us::eng" "The english method used")
+  (defun +zenith/restore-input-method ()
+    (interactive)
+    (when +zenith/previous-input-method
+      (shell-command (concat "ibus engine " +zenith/previous-input-method))))
+
+  (defun +zenith/change-to-english-input-method ()
+    (interactive)
+    (setq +zenith/previous-input-method (shell-command-to-string "ibus engine"))
+    (shell-command (concat "ibus engine " +zenith/english-input-method)))
+
+  (add-hook 'evil-insert-state-exit-hook #'+zenith/change-to-english-input-method)
+  (add-hook 'evil-insert-state-entry-hook #'+zenith/restore-input-method))
+
+
 ;; Reconfigure ivy
 (after! ivy
   (setq ivy-magic-slash-non-match-action 'ivy-magic-slash-non-match-cd-selected))
@@ -168,6 +188,9 @@ _o_: Open entry   _e_: Email entry  ^ ^                 _q_: quit
 ;; Reconfigure org
 (after! org
 
+  (sp-with-modes 'org-mode
+    (sp-local-pair "=" "=" :actions :rem))
+
   (add-hook! org-mode
     ;; Enable cdlatex mode
     ;; TODO configure cdlatex-command-alist
@@ -212,12 +235,10 @@ _o_: Open entry   _e_: Email entry  ^ ^                 _q_: quit
           ("SOMEDAY" ("TODO" . nil))))
 
   ;; Org Capture
-  (require 'org-protocol)
-
   (defun transform-square-brackets-to-round-ones(string-to-transform)
     "Transforms [ into ( and ] into ), other chars left unchanged."
     (concat
-     (mapcar #'(lambda (c) (if (equal c ?[) ?\( (if (equal c ?]) ?\) c))) string-to-transform)))
+     (mapcar #'(lambda (c) (if (equal c ?\[) ?\( (if (equal c ?\]) ?\) c))) string-to-transform)))
 
   (setq org-capture-templates
         '(("p" "Protocol" entry (file+headline "~/Documents/Notes/notes.org" "Bookmarks")

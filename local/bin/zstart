@@ -1,0 +1,12 @@
+#!/bin/sh
+
+ibus-daemon --xim -r -d &
+feh --bg-scale /usr/share/backgrounds/Beaver_Wallpaper_Grey_4096x2304.png &
+setxkbmap -option ctrl:nocaps &
+stalonetray &
+sh -c "nohup ~/.nutstore/dist/bin/nutstore-pydaemon.py >/dev/null 2>&1 &" &
+xscreensaver &
+caffeine-indicator &
+nm-applet &
+urxvtd &
+xcompmgr &
