@@ -115,17 +115,19 @@ _o_: Open entry   _e_: Email entry  ^ ^                 _q_: quit
 
 ;; Add hook for change input method
 (after! evil
-  (defvar +zenith/previous-input-method nil "The previous input method")
+  (defvar-local +zenith/previous-input-method nil "The previous input method")
   (defvar +zenith/english-input-method "xkb:us::eng" "The english method used")
   (defun +zenith/restore-input-method ()
     (interactive)
     (when +zenith/previous-input-method
-      (shell-command (concat "ibus engine " +zenith/previous-input-method))))
+      (let ((inhibit-message t))
+       (shell-command (concat "ibus engine " +zenith/previous-input-method)))))
 
   (defun +zenith/change-to-english-input-method ()
     (interactive)
     (setq +zenith/previous-input-method (shell-command-to-string "ibus engine"))
-    (shell-command (concat "ibus engine " +zenith/english-input-method)))
+    (let ((inhibit-message t))
+      (shell-command (concat "ibus engine " +zenith/english-input-method))))
 
   (add-hook 'evil-insert-state-exit-hook #'+zenith/change-to-english-input-method)
   (add-hook 'evil-insert-state-entry-hook #'+zenith/restore-input-method))
@@ -342,7 +344,8 @@ _o_: Open entry   _e_: Email entry  ^ ^                 _q_: quit
    '((emacs-lisp . t)
      (latex . t)
      (python . t)
-     (shell . t)))
+     (shell . t)
+     (dot . t)))
 
 
 

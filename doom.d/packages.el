@@ -15,3 +15,4 @@
 (package! ms-python)
 (package! org-ref)
 (package! fd-dired :recipe (:fetcher github :repo "yqrashawn/fd-dired"))
+(package! graphviz-dot-mode)
