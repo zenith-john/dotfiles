@@ -106,6 +106,4 @@ alias ga="git add"
 eval "$(lua ~/.zplug/repos/skywind3000/z.lua/z.lua --init zsh)"
 
 autoload -U compinit && compinit -u
-
-source ~/.zprofile
 # zprof

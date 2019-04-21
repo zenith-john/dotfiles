@@ -3,7 +3,8 @@
 ;; Place your private configuration here
 
 ;; Set the font
-(setq doom-font (font-spec :family "Sarasa Mono SC" :size 16 :weight 'bold))
+(setq doom-font (font-spec :family "Iosevka Term SS09" :size 16 :weight 'semi-bold))
+(setq doom-unicode-font (font-spec :family "Sarasa Term SC" :weight 'bold))
 
 ;; Change leader key to ,
 (setq doom-leader-key ","
@@ -26,11 +27,6 @@
     (org-cdlatex-mode 1))
   (add-hook! latex-mode
     (cdlatex-mode 1)))
-
-(def-package! org-edit-latex
-  :after org
-  :init
-  (require 'org-edit-latex))
 
 (def-package! keyfreq
   :commands (keyfreq-mode keyfreq-show keyfreq-reset)
@@ -60,6 +56,7 @@
   :init
   (require 'bibtex-completion)
   (setq org-ref-completion-library 'org-ref-reftex)
+  ;; Copy from org-ref-ivy-cite
   (defhydra org-ref-cite-hydra (:color blue)
     "
 _p_: Open pdf     _w_: WOS          _g_: Google Scholar _K_: Copy citation to clipboard
@@ -113,10 +110,39 @@ _o_: Open entry   _e_: Email entry  ^ ^                 _q_: quit
         (fd-dired (file-name-directory (buffer-file-name)) query))
       (evil-ex-define-cmd "fd" #'+evil:fd)))
 
+(def-package! sdcv
+  :commands (sdcv-search-input+ sdcv-search-pointer+)
+  :init
+  (map! :i "C-." #'sdcv-search-pointer+)
+  :config
+  (setq sdcv-say-word-p t)
+
+  (setq sdcv-dictionary-data-dir "/usr/share/stardict/dic/")
+
+  (setq sdcv-dictionary-simple-list '("简明英汉字典增强版")))
+
+(def-package! company-english-helper
+  :commands (toggle-company-english-helper))
+
+(def-package! insert-translated-name
+  :commands (insert-translated-name-insert)
+  :init
+  (map! :i "C-'" #'insert-translated-name-insert)
+  :config
+  (defun +zenith/advice-change-to-chinese-input-method (&rest r)
+    (+zenith/change-to-chinese-input-method))
+  (defun +zenith/advice-restore-input-method (&rest r)
+    (+zenith/restore-input-method))
+
+  (advice-add! 'insert-translated-name-active :before #'+zenith/advice-change-to-chinese-input-method)
+  (advice-add! 'insert-translated-name-inactive :after #'+zenith/advice-restore-input-method))
+
+
 ;; Add hook for change input method
 (after! evil
   (defvar-local +zenith/previous-input-method nil "The previous input method")
-  (defvar +zenith/english-input-method "xkb:us::eng" "The english method used")
+  (defvar +zenith/english-input-method "xkb:us::eng" "The English input method used")
+  (defvar +zenith/chinese-input-method "rime" "The Chinese input method used")
   (defun +zenith/restore-input-method ()
     (interactive)
     (when +zenith/previous-input-method
@@ -128,6 +154,12 @@ _o_: Open entry   _e_: Email entry  ^ ^                 _q_: quit
     (setq +zenith/previous-input-method (shell-command-to-string "ibus engine"))
     (let ((inhibit-message t))
       (shell-command (concat "ibus engine " +zenith/english-input-method))))
+
+  (defun +zenith/change-to-chinese-input-method ()
+    (interactive)
+    (setq +zenith/previous-input-method (shell-command-to-string "ibus engine"))
+    (let ((inhibit-message t))
+      (shell-command (concat "ibus engine " +zenith/chinese-input-method))))
 
   (add-hook 'evil-insert-state-exit-hook #'+zenith/change-to-english-input-method)
   (add-hook 'evil-insert-state-entry-hook #'+zenith/restore-input-method))
@@ -179,7 +211,7 @@ _o_: Open entry   _e_: Email entry  ^ ^                 _q_: quit
                   (cursor-type)
                   (no-special-glyphs . t))))
 
-;; configure yasnippet disable tab expand
+;; configure yasnippet
 (after! yasnippet
   (map! :map yas-minor-mode-map
         "<tab>" nil
@@ -273,6 +305,7 @@ _o_: Open entry   _e_: Email entry  ^ ^                 _q_: quit
   (advice-add 'org-capture-finalize :after 'kk/delete-frame-if-neccessary)
   (advice-add 'org-capture-kill :after 'kk/delete-frame-if-neccessary)
   (advice-add 'org-capture-refile :after 'kk/delete-frame-if-neccessary)
+
   ;; Org tag
   (setq org-tag-alist
         '(("Improvement" . ?i) ("Homework" . ?h) ("Personal" . ?p) ("Question" . ?q) ("Idea" . ?d)))

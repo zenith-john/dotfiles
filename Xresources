@@ -89,7 +89,7 @@ URxvt.geometry: 80x40
 URxvt.xftAntialias: true
 !URxvt.font: xft:Monaco:bold:size=13,xft:DejaVu Sans Mono:bold:size=13,xft:WenQuanYi Micro Hei:bold:antialias=True
 !URxvt.font: xft:Monaco:bold:size=13,xft:DejaVu Sans Mono:bold:size=13,xft:微軟正黑體:bold:antialias=True
-URxvt.font: xft:Sarasa Mono SC:bold:size=13:antialias=True
+URxvt.font: xft:Iosevka Term SS09:bold:size=13,xft:Sarasa Mono SC:bold:antialias=True
 !URxvt.font: xft:DejaVu Sans Mono:bold:size=14,xft:思源黑体:bold:antialias=True
 !URxvt.searchable-scrollback: false
 URxvt.iso14755: false
