@@ -31,7 +31,43 @@
 (def-package! keyfreq
   :commands (keyfreq-mode keyfreq-show keyfreq-reset)
   :config
-  (keyfreq-mode 1))
+  (keyfreq-mode 1)
+  (setq keyfreq-excluded-commands '(org-self-insert-command
+                                    self-insert-command
+                                    next-line
+                                    previous-line
+                                    right-char
+                                    left-char
+                                    cua-scroll-down
+                                    company-ignore
+                                    org-delete-backward-char
+                                    python-indent-dedent-line
+                                    python-indent-dedent-line-backspace
+                                    delete-backward-char
+                                    org-return
+                                    ivy-next-line
+                                    ivy-backward-delete-char
+                                    company-select-next-or-abort
+                                    company-select-previous-or-abort
+                                    end-of-line
+                                    magit-next-line
+                                    mwheel-scroll
+                                    isearch-printing-char
+                                    newline
+                                    mouse-drag-region
+                                    org-cycle
+                                    ivy-previous-line
+                                    org-meta-return
+                                    mouse-set-point
+                                    kill-line
+                                    find-file
+                                    org-agenda-next-line
+                                    ivy-done
+                                    minibuffer-keyboard-quit
+                                    magit-previous-line
+                                    beginning-of-line
+                                    indent-for-tab-command
+                                    )))
 
 (def-package! org-noter
   :commands (org-noter)
@@ -41,7 +77,9 @@
   (defun org-noter--set-notes-scroll (window &rest ignored)
     nil)
   (setq org-noter-always-create-frame nil
-        org-noter-kill-frame-at-session-end nil)
+        org-noter-kill-frame-at-session-end nil
+        org-noter-hide-other nil)
+
   (map! :map pdf-view-mode-map :gn "C-i" #'org-noter-insert-note-toggle-no-questions)
   (map! :map pdf-view-mode-map :gn "q" #'org-noter-kill-session)
   (map! :map pdf-view-mode-map :gn "i" #'org-noter-insert-note))
@@ -113,7 +151,7 @@ _o_: Open entry   _e_: Email entry  ^ ^                 _q_: quit
 (def-package! sdcv
   :commands (sdcv-search-input+ sdcv-search-pointer+)
   :init
-  (map! :i "C-." #'sdcv-search-pointer+)
+  (map! :ni "C-;" #'sdcv-search-pointer+)
   :config
   (setq sdcv-say-word-p t)
 
@@ -128,42 +166,61 @@ _o_: Open entry   _e_: Email entry  ^ ^                 _q_: quit
   :commands (insert-translated-name-insert)
   :init
   (map! :i "C-'" #'insert-translated-name-insert)
+  (defun +zenith/advice-insert-translated-name-active (style)
+     (interactive "P")
+     (add-hook 'after-change-functions 'insert-translated-name-monitor-after-change t t))
+  (advice-add! 'insert-translated-name-active :before #'+zenith/advice-insert-translated-name-active))
+
+(def-package! pyim
+  :init
+  (setq pyim-page-tooltip 'posframe)
+  (setq default-input-method "pyim")
+
+  (map! "M-/" 'pyim-convert-string-at-point)
+  (use-package liberime
+    :load-path "/home/zenith-john/.doom.d/third_party/liberime/build/"
+    :config
+    (liberime-start (expand-file-name "/usr/share/rime-data/")
+                    (expand-file-name "~/.doom.d/pyim/rime/"))
+    (liberime-select-schema "luna_pinyin_simp")
+    (setq pyim-default-scheme 'rime))
   :config
-  (defun +zenith/advice-change-to-chinese-input-method (&rest r)
-    (+zenith/change-to-chinese-input-method))
-  (defun +zenith/advice-restore-input-method (&rest r)
-    (+zenith/restore-input-method))
+  (pyim-isearch-mode 1)
+  (add-to-list 'pyim-punctuation-dict '("\\" "、"))
+  (setq-default pyim-english-input-switch-functions
+                '(pyim-probe-dynamic-english
+                  pyim-probe-isearch-mode
+                  pyim-probe-program-mode))
 
-  (advice-add! 'insert-translated-name-active :before #'+zenith/advice-change-to-chinese-input-method)
-  (advice-add! 'insert-translated-name-inactive :after #'+zenith/advice-restore-input-method))
+  (setq-default pyim-punctuation-half-width-functions
+                '(pyim-probe-punctuation-line-beginning
+                  pyim-probe-punctuation-after-punctuation)))
 
 
-;; Add hook for change input method
-(after! evil
-  (defvar-local +zenith/previous-input-method nil "The previous input method")
-  (defvar +zenith/english-input-method "xkb:us::eng" "The English input method used")
-  (defvar +zenith/chinese-input-method "rime" "The Chinese input method used")
-  (defun +zenith/restore-input-method ()
-    (interactive)
-    (when +zenith/previous-input-method
-      (let ((inhibit-message t))
-       (shell-command (concat "ibus engine " +zenith/previous-input-method)))))
+(def-package! auto-save
+  :init
+  (require 'auto-save)
 
-  (defun +zenith/change-to-english-input-method ()
-    (interactive)
-    (setq +zenith/previous-input-method (shell-command-to-string "ibus engine"))
-    (let ((inhibit-message t))
-      (shell-command (concat "ibus engine " +zenith/english-input-method))))
+  (setq auto-save-idle 2
+        auto-save-silent t
+        auto-save-delete-trailing-whitespace t)
 
-  (defun +zenith/change-to-chinese-input-method ()
-    (interactive)
-    (setq +zenith/previous-input-method (shell-command-to-string "ibus engine"))
-    (let ((inhibit-message t))
-      (shell-command (concat "ibus engine " +zenith/chinese-input-method))))
+  (auto-save-enable))
 
-  (add-hook 'evil-insert-state-exit-hook #'+zenith/change-to-english-input-method)
-  (add-hook 'evil-insert-state-entry-hook #'+zenith/restore-input-method))
-
+(def-package! awesome-tab
+  :init
+  (setq awesometab-hide-tabs-hooks
+        '(magit-status-mode-hook magit-popup-mode-hook reb-mode-hook helpful-mode-hook))
+  :config
+  (require 'awesome-tab)
+  (setq awesome-tab-style 'chamfer
+        awesome-tab-label-fixed-length 14)
+  (awesome-tab-mode t)
+  (map! :leader
+        :nv
+        "TAB" #'awesome-tab-build-ivy-source)
+  (dotimes (i 10)
+    (map! :nvi (concat "M-" (int-to-string i)) #'awesome-tab-select-visible-tab)))
 
 ;; Reconfigure ivy
 (after! ivy
@@ -178,7 +235,7 @@ _o_: Open entry   _e_: Email entry  ^ ^                 _q_: quit
   (setq company-idle-delay 0
         company-minimum-prefix-length 2)
   (setq company-box-icons-alist 'company-box-icons-all-the-icons)
-  (map! :i "C-j" #'company-complete-common))
+  (map! :i "C-x C-j" #'company-complete-common))
 
 (after! lsp-ui
   (setq lsp-ui-doc-use-childframe t
@@ -210,14 +267,6 @@ _o_: Open entry   _e_: Email entry  ^ ^                 _q_: quit
                   (no-other-frame . t)
                   (cursor-type)
                   (no-special-glyphs . t))))
-
-;; configure yasnippet
-(after! yasnippet
-  (map! :map yas-minor-mode-map
-        "<tab>" nil
-        "TAB" nil
-        :i
-        "M-j" yas-maybe-expand))
 
 ;; Reconfigure org
 (after! org

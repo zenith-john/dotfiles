@@ -1,2 +1,2 @@
 #!/bin/sh
-emacsclient -c -F '((name . "org-note"))' -e "(persp-switch \"Notes\")"
+emacsclient -c -F '((name . "org-note"))' -e "(when (featurep 'persp-mode)(persp-switch \"Notes\"))"

@@ -1,2 +1,2 @@
 #!/bin/sh
-emacsclient -c -F '((name . "org-agenda"))' -e "(progn (persp-switch \"Agenda\")(setq org-agenda-window-setup 'only-window)(org-agenda 0 \"b\"))"
+emacsclient -c -F '((name . "org-agenda"))' -e "(progn (when (featurep 'persp-mode) (persp-switch \"Agenda\")) (setq org-agenda-window-setup 'only-window)(org-agenda 0 \"b\"))"
