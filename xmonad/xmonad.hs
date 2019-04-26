@@ -10,6 +10,7 @@
 import Control.Monad
 import Data.Monoid
 import Data.List
+import Data.Char
 import XMonad
 
 import XMonad.Actions.CopyWindow
@@ -106,12 +107,20 @@ myProjects =
     Project "emacs" "~" . Just $ spawn "emacs",
     Project "py" "~" Nothing,
     Project "view" "~" Nothing,
-    Project "matlab" "~" Nothing,
+    Project "writer" "~" Nothing,
+    Project "matlab" "~" Just $ spawn "mymatlab",
     Project "gimp" "/tmp" . Just $ spawn "gimp",
     Project "inkscape" "/tmp" . Just $ spawn "inkscape"
   ]
 
-myWorkspaces = map projectName myProjects
+myFreqWorkspace :: Int
+myFreqWorkspace = 6
+
+myWorkspaces = (take myFreqWorkspace projects)
+  ++ (map show [(myFreqWorkspace+1)..9])
+  ++ (drop myFreqWorkspace projects)
+  where
+    projects = map projectName myProjects
 -- Border colors for unfocused and focused windows, respectively.
 --
 myNormalBorderColor = "#7c7c7c"

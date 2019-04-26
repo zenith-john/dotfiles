@@ -38,8 +38,7 @@ eval $(dircolors -b)
 [ -f ~/.zplug/init.zsh ] || (curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh)
 source ~/.zplug/init.zsh
 
-zplug "supercrabtree/k"
-#zplug "changyuheng/zsh-interactive-cd"
+zplug "zenith-john/k"
 zplug "zsh-users/zsh-syntax-highlighting"
 zplug "zsh-users/zsh-completions"
 zplug "dannynimmo/punctual-zsh-theme", as:theme
@@ -74,15 +73,12 @@ alias ....="cd ../../.."
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     alias ls='ls --color=auto'
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
 fi
 
 AUTO_LS_COMMANDS=(ls)
 auto-ls-ls(){
-   ls --color=auto
-   [[ $AUTO_LS_NEWLINE != false ]] && echo ""
+    ls --color=auto
+    [[ $AUTO_LS_NEWLINE != false ]] && echo ""
 }
 
 # some more ls aliases
@@ -91,16 +87,32 @@ alias la='ls -A'
 alias l='ls'
 
 if [ $+commands[fd] ]; then
-	alias find=fd
+    alias find=fd
+fi
+
+if [ $+commands[rg] ]; then
+    alias grep=rg
+    alias fgrep="rg -f"
+    alias egrep="rg -e"
+elif [ -x /usr/bin/dircolors ]; then
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+if [ $+commands[ccat] ]; then
+    alias cat=ccat
 fi
 
 # git alias
-alias gs="git status"
-alias gd="git diff"
-alias gp="git push"
-alias gpull="git pull"
-alias gc="git commit"
-alias ga="git add"
+if [ $+commands[git] ]; then
+    alias gs="git status"
+    alias gd="git diff"
+    alias gp="git push"
+    alias gpull="git pull"
+    alias gc="git commit"
+    alias ga="git add"
+fi
 
 # z.lua configuration
 eval "$(lua ~/.zplug/repos/skywind3000/z.lua/z.lua --init zsh)"

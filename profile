@@ -47,3 +47,7 @@ export PKG_CONFIG=/usr/bin/pkg-config
 
 # export z.lua for ranger
 export RANGER_ZLUA=~/.zplug/repos/skywind3000/z.lua/z.lua
+
+export TERM="xterm-256color"
+export LC_ALL="en_US.UTF-8"
+export LANG="en_US.UTF-8"
