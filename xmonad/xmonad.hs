@@ -79,7 +79,7 @@ myClickJustFocuses = False
 
 -- Width of the window border in pixels.
 --
-myBorderWidth = 3
+myBorderWidth = 1
 
 -- modMask lets you specify which modkey you want to use. The default
 -- is mod1Mask ("left alt").  You may also consider using mod3Mask
@@ -108,19 +108,15 @@ myProjects =
     Project "py" "~" Nothing,
     Project "view" "~" Nothing,
     Project "writer" "~" Nothing,
-    Project "matlab" "~" Just $ spawn "mymatlab",
+    Project "7" "~" Nothing,
+    Project "8" "~" Nothing,
+    Project "9" "~" Nothing,
+    Project "matlab" "~" . Just $ spawn "mymatlab",
     Project "gimp" "/tmp" . Just $ spawn "gimp",
     Project "inkscape" "/tmp" . Just $ spawn "inkscape"
   ]
 
-myFreqWorkspace :: Int
-myFreqWorkspace = 6
-
-myWorkspaces = (take myFreqWorkspace projects)
-  ++ (map show [(myFreqWorkspace+1)..9])
-  ++ (drop myFreqWorkspace projects)
-  where
-    projects = map projectName myProjects
+myWorkspaces = map projectName myProjects
 -- Border colors for unfocused and focused windows, respectively.
 --
 myNormalBorderColor = "#7c7c7c"
@@ -252,9 +248,11 @@ myAdditionalKeys =
   ("M-; c", namedScratchpadAction myScratchPads "org-capture"),
   ("M-; d", namedScratchpadAction myScratchPads "zeal"),
   ("M-; n", namedScratchpadAction myScratchPads "org-note"),
+  ("M-; e", spawn "emacsclient -c"),
   ("M-; t", namedScratchpadAction myScratchPads "mail"),
   ("M-; v", namedScratchpadAction myScratchPads "volume"),
   ("M-; w", namedScratchpadAction myScratchPads "writefull"),
+  ("M-; f", namedScratchpadAction myScratchPads "file"),
   ("M-; p", spawn "rofi -sort -matching fuzzy -show file -modi file:\"rofi-file-browser $HOME/Documentation\"")
   , ("<Print>", spawn "flameshot gui")
   , ("M-d", toggleCopyToAll)
@@ -313,11 +311,11 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) =
 -- which denotes layout choice.
 --
 myLayout = avoidStruts $ (tiled ||| tab ||| full)
-        --Layouts
+  --Layouts
   where
     tiled = named "tile" $ smartBorders (ResizableTall 1 (2 / 100) (1 / 2) [])
     -- mtile     = named "mtile" $ Mirror tiled
-    tab = named "tab" $ noBorders $ tabbed shrinkText tabConfig
+    tab = named "tab" $ tabbed shrinkText tabConfig
     full = named "full" $ noBorders Full
     -- grid      = named "grid" $ smartBorders(Grid)
 
@@ -381,14 +379,11 @@ myManageHook =
       ]
     myFloat = ["Hangouts", "Gnome-terminal", "GoldenDict", "Zeal"]
     myWorkspaceMove = [("Firefox", "web"),
+	("Google-chrome", "web"),
 	("jetbrains-pycharm", "py"),
 	("MATLAB R2018b - academic use", "matlab"),
-        ("MATLAB R2018b", "matlab"),
-	("Wpp", "office"),
-	("Wps", "office"),
-	("Et", "office"),
-	("FoxitReader", "view"),
-        ("Evince", "view")]
+        ("MATLAB R2018b", "matlab")
+        ]
 
 configuredRect::Rational->Rational->Rational->Rational->W.RationalRect
 configuredRect l t w h =
@@ -406,14 +401,15 @@ myScratchPads =
    , NS "ranger" "urxvtc -title ranger -e ranger" (title =? "ranger") doBottomLeftFloat
    , NS "volume" "urxvtc -title alsa -e alsamixer" (title =? "alsa") doTopLeftFloat
    , NS "zeal" "zeal" (className =? "Zeal") doTopLeftFloat
-   , NS "writefull" "writefull" (className =? "Writefull") doTopLeftFloat]
+   , NS "writefull" "writefull" (className =? "Writefull") doTopLeftFloat
+   , NS "file" "nautilus" (className =? "Nautilus") doRightFloat]
   where
     prefixTitle prefix = fmap (prefix `isPrefixOf`) title
     doTopFloat = customFloating $ configuredRect (1/4) 0 (1/2) (1/2)
     doTopLeftFloat = customFloating $ configuredRect 0 0 (1/2) (1/2)
     doBottomLeftFloat = customFloating $ configuredRect 0 (1/2) (1/2) (1/2)
     doLeftFloat = customFloating $ configuredRect 0 0 (1/2) 1
-    doRightFloat = customFloating $ configuredRect (2/3) 0 (1/3) 1
+    doRightFloat = customFloating $ configuredRect (1/2) 0 (1/2) 1
 ------------------------------------------------------------------------
 -- Event handling
 -- * EwmhDesktops users should change this to ewmhDesktopsEventHook
@@ -422,7 +418,7 @@ myScratchPads =
 -- return (All True) if the default handler is to be run afterwards. To
 -- combine event hooks use mappend or mconcat from Data.Monoid.
 --
-myEventHook = ewmhDesktopsEventHook <+> fullscreenEventHook <+> docksEventHook
+myEventHook = fullscreenEventHook <+> docksEventHook
 
 ------------------------------------------------------------------------
 -- Status bars and logging
@@ -434,7 +430,7 @@ myLogHook = do
   dynamicLogWithPP xmobarPP
   fadeInactiveLogHook fadeAmount
   where
-    fadeAmount = 0xbbbbbbbb
+    fadeAmount = 0xdddddddd
 
 ------------------------------------------------------------------------
 -- Startup hook
@@ -452,7 +448,7 @@ myStartupHook = do
 -- Run xmonad with the settings you specify. No need to modify this.
 --
 main =
-  xmonad =<< xmobar (docks . dynamicProjects myProjects $ defaults)
+  xmonad =<< xmobar (ewmh . docks . dynamicProjects myProjects $ defaults)
 
 -- A structure containing your configuration settings, overriding
 -- fields in the default config. Any you don't override, will

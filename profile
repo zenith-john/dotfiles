@@ -26,7 +26,7 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
-export PATH="/home/zenith-john/.cargo/bin/:/home/zenith-john/anaconda3/bin/:$PATH"
+export PATH="/home/zenith-john/.cargo/bin/:$PATH"
 
 
 # Unset manpath so we can inherit from /etc/manpath via the `manpath` command

@@ -86,22 +86,8 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls'
 
-if [ $+commands[fd] ]; then
-    alias find=fd
-fi
-
-if [ $+commands[rg] ]; then
-    alias grep=rg
-    alias fgrep="rg -f"
-    alias egrep="rg -e"
-elif [ -x /usr/bin/dircolors ]; then
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-fi
-
 if [ $+commands[ccat] ]; then
-    alias cat=ccat
+    alias c=ccat
 fi
 
 # git alias
@@ -112,8 +98,10 @@ if [ $+commands[git] ]; then
     alias gpull="git pull"
     alias gc="git commit"
     alias ga="git add"
+    alias gget="git submodule add --depth=1"
 fi
 
+alias pip=pip3
 # z.lua configuration
 eval "$(lua ~/.zplug/repos/skywind3000/z.lua/z.lua --init zsh)"
 
