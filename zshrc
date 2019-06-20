@@ -33,6 +33,7 @@ setopt EXTENDED_GLOB
 fpath+=~/.zfunc
 
 export EDITOR="emacsclient -c"
+export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=gasp'
 eval $(dircolors -b)
 
 [ -f ~/.zplug/init.zsh ] || (curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh | zsh)
@@ -104,6 +105,10 @@ fi
 alias pip=pip3
 # z.lua configuration
 eval "$(lua ~/.zplug/repos/skywind3000/z.lua/z.lua --init zsh)"
+
+export PATH="/home/zenith-john/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
 
 autoload -U compinit && compinit -u
 # zprof

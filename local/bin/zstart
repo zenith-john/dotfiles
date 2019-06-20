@@ -11,3 +11,4 @@ caffeine-indicator &
 nm-applet &
 urxvtd &
 xcompmgr &
+emacs --daemon

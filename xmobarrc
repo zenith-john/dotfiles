@@ -4,7 +4,7 @@ Config { font = "xft:Sarasa Mono SC:bold:size=9"
        , border = BottomB
        , bgColor = "black"
        , fgColor = "grey"
-       , position = TopP 0 200
+       , position = TopP 0 190
        , textOffset = -1
        , iconOffset = -1
        , alpha = 255

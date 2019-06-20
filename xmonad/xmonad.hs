@@ -104,7 +104,7 @@ myProjects :: [Project]
 myProjects =
   [ Project "web" "~" . Just $ spawn "firefox",
     Project "term" "~" . Just $ spawn (myTerminal ++ " -e one-tmux"),
-    Project "emacs" "~" . Just $ spawn "emacs",
+    Project "emacs" "~" Nothing,
     Project "py" "~" Nothing,
     Project "view" "~" Nothing,
     Project "writer" "~" Nothing,
@@ -244,16 +244,13 @@ myAdditionalKeys =
   ("M-; r", namedScratchpadAction myScratchPads "ranger"),
   ("M-; q", namedScratchpadAction myScratchPads "terminal"),
   ("M-; i", namedScratchpadAction myScratchPads "ipython"),
-  ("M-; a", namedScratchpadAction myScratchPads "org-agenda"),
-  ("M-; c", namedScratchpadAction myScratchPads "org-capture"),
   ("M-; d", namedScratchpadAction myScratchPads "zeal"),
-  ("M-; n", namedScratchpadAction myScratchPads "org-note"),
   ("M-; e", spawn "emacsclient -c"),
   ("M-; t", namedScratchpadAction myScratchPads "mail"),
   ("M-; v", namedScratchpadAction myScratchPads "volume"),
   ("M-; w", namedScratchpadAction myScratchPads "writefull"),
-  ("M-; f", namedScratchpadAction myScratchPads "file"),
-  ("M-; p", spawn "rofi -sort -matching fuzzy -show file -modi file:\"rofi-file-browser $HOME/Documentation\"")
+  ("M-; f", runOrRaiseNext "nautilus" (className =? "Nautilus")),
+  ("M-; p", spawn "rofi -sort -matching fuzzy -show file -modi file:\"rofi-file-browser $HOME/Documents\"")
   , ("<Print>", spawn "flameshot gui")
   , ("M-d", toggleCopyToAll)
   , ("M-n", switchLayer)
@@ -264,6 +261,7 @@ myAdditionalKeys =
   , ("M-j", windowGo D True)
   , ("M-k", windowGo U True)
   , ("M-l", bindOn LD [("tab", windows W.focusDown),("", windowGo R True)])
+  , ("M-w", spawn "rofi -sort -matching fuzzy -show window")
   , ("M-S-<L>", withFocused (keysResizeWindow (-30,0) (0,0))) --shrink float at right
   , ("M-S-<R>", withFocused (keysResizeWindow (30,0) (0,0))) --expand float at right
   , ("M-S-<D>", withFocused (keysResizeWindow (0,30) (0,0))) --expand float at bottom
@@ -394,15 +392,13 @@ configuredRect l t w h =
 myScratchPads =
   [NS "terminal" "urxvtc -title scratchpad" (title =? "scratchpad") doTopFloat
    , NS "ipython" "urxvtc -title ipython -e ipython" (title =? "ipython") doTopLeftFloat
-   , NS "org-agenda" "org-agenda" (title =? "org-agenda") doRightFloat
-   , NS "org-capture" "org-capture" (title =? "org-capture") doRightFloat
-   , NS "org-note" "org-note" (title =? "org-note") doRightFloat
    , NS "mail" "thunderbird" (className =? "Thunderbird") doLeftFloat
    , NS "ranger" "urxvtc -title ranger -e ranger" (title =? "ranger") doBottomLeftFloat
    , NS "volume" "urxvtc -title alsa -e alsamixer" (title =? "alsa") doTopLeftFloat
    , NS "zeal" "zeal" (className =? "Zeal") doTopLeftFloat
    , NS "writefull" "writefull" (className =? "Writefull") doTopLeftFloat
-   , NS "file" "nautilus" (className =? "Nautilus") doRightFloat]
+   -- , NS "file" "nautilus" (className =? "Nautilus") doRightFloat
+   ]
   where
     prefixTitle prefix = fmap (prefix `isPrefixOf`) title
     doTopFloat = customFloating $ configuredRect (1/4) 0 (1/2) (1/2)
