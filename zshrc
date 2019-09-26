@@ -71,6 +71,9 @@ alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
 
+alias e="TERM=xterm-256color emacsclient -nw -c"
+alias ek="emacsclient -e \"(kill-emacs)\""
+
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     alias ls='ls --color=auto'
@@ -86,6 +89,8 @@ auto-ls-ls(){
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls'
+
+alias clean="rm -i *.bbl *.bcf *.aux *.log *.blg *.run.xml *.synctex.gz"
 
 if [ $+commands[ccat] ]; then
     alias c=ccat
@@ -105,10 +110,6 @@ fi
 alias pip=pip3
 # z.lua configuration
 eval "$(lua ~/.zplug/repos/skywind3000/z.lua/z.lua --init zsh)"
-
-export PATH="/home/zenith-john/.pyenv/bin:$PATH"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
 
 autoload -U compinit && compinit -u
 # zprof
