@@ -102,13 +102,13 @@ myModMask = mod4Mask
 
 myProjects :: [Project]
 myProjects =
-  [ Project "web" "~" . Just $ spawn "firefox",
-    Project "term" "~" . Just $ spawn (myTerminal ++ " -e one-tmux"),
-    Project "emacs" "~" Nothing,
-    Project "py" "~" Nothing,
-    Project "view" "~" Nothing,
-    Project "writer" "~" Nothing,
-    Project "7" "~" Nothing,
+  [ Project "1:web" "~" . Just $ spawn "firefox",
+    Project "2:term" "~" . Just $ spawn (myTerminal ++ " -e one-tmux"),
+    Project "3:emacs" "~" Nothing,
+    Project "4:py" "~" Nothing,
+    Project "5:view" "~" Nothing,
+    Project "6:writer" "~" Nothing,
+    Project "7:explorer" "~" Nothing,
     Project "8" "~" Nothing,
     Project "9" "~" Nothing,
     Project "matlab" "~" . Just $ spawn "mymatlab",
@@ -261,7 +261,7 @@ myAdditionalKeys =
   , ("M-j", windowGo D True)
   , ("M-k", windowGo U True)
   , ("M-l", bindOn LD [("tab", windows W.focusDown),("", windowGo R True)])
-  , ("M-w", spawn "rofi -sort -matching fuzzy -show window")
+  , ("M-m", spawn "rofi -sort -matching fuzzy -show window")
   , ("M-S-<L>", withFocused (keysResizeWindow (-30,0) (0,0))) --shrink float at right
   , ("M-S-<R>", withFocused (keysResizeWindow (30,0) (0,0))) --expand float at right
   , ("M-S-<D>", withFocused (keysResizeWindow (0,30) (0,0))) --expand float at bottom
@@ -292,7 +292,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) =
   , ((modm, button2), (\w -> focus w >> Flex.mouseWindow Flex.linear w))
     -- mod-button3, Set the window to floating mode and resize by dragging
 
-  , ((modm, button3), (\w -> focus w >> Flex.mouseWindow Flex.resize w))
+  , ((modm .|. shiftMask, button1), (\w -> focus w >> Flex.mouseWindow Flex.resize w))
   -- , ( (modm, button3)
   -- , (\w -> focus w >> mouseResizeWindow w >> windows W.shiftMaster))
     -- you may also bind events to the mouse scroll wheel (button4 and button5)
