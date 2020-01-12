@@ -1,14 +1,7 @@
 #!/bin/sh
 
 ibus-daemon --xim -r -d &
-feh --bg-scale /home/zenith-john/Pictures/desktop.png &
 setxkbmap -option ctrl:nocaps &
 setxkbmap -option shift:both_capslock &
-sh -c "nohup ~/.nutstore/dist/bin/nutstore-pydaemon.py >/dev/null 2>&1 &" &
-stalonetray &
-xscreensaver &
-caffeine-indicator &
 nm-applet &
-urxvtd &
-xcompmgr &
 emacs --daemon

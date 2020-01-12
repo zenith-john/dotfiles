@@ -175,6 +175,7 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) =
   , ((modm .|. shiftMask, xK_k), windows W.swapUp)
     -- lock screen
   , ((modm .|. shiftMask, xK_z), spawn "xscreensaver-command -lock")
+  , ((modm .|. shiftMask, xK_x), spawn "systemctl suspend")
     -- Shrink the master area
   -- , ((modm, xK_h), sendMessage Shrink)
     -- Expand the master area
