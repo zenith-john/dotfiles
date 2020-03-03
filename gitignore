@@ -1,0 +1,17 @@
+*.o
+*.pyc
+*.elc
+.DS_Store
+TAGS
+/.ccls-cache/
+/.idea/
+/.ensime_cache/
+/.eunit/
+/.hg/
+/.fslckout/
+/_FOSSIL_/
+/.bzr/
+/_darcs/
+/.tox/
+/.svn/
+/.stack-work/

@@ -109,6 +109,7 @@ fi
 
 alias pip=pip3
 # z.lua configuration
+export _ZL_MATCH_MODE=1
 eval "$(lua ~/.zplug/repos/skywind3000/z.lua/z.lua --init zsh)"
 
 # load GMXRC
@@ -130,6 +131,8 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
+
+source /usr/share/nvm/init-nvm.sh
 
 autoload -U compinit && compinit -u
 # zprof

@@ -1,7 +1,4 @@
 #!/bin/sh
 
-ibus-daemon --xim -r -d &
-setxkbmap -option ctrl:nocaps &
-setxkbmap -option shift:both_capslock &
-nm-applet &
+fcitx &
 emacs --daemon
