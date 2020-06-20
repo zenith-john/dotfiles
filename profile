@@ -26,9 +26,6 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
-export PATH="/home/zenith-john/.cargo/bin/:$PATH"
-
-
 # Unset manpath so we can inherit from /etc/manpath via the `manpath` command
 unset MANPATH # delete if you already modified MANPATH elsewhere in your config
 export MANPATH="$NPM_PACKAGES/share/man:$(manpath)"
@@ -54,3 +51,6 @@ export XMODIFIERS=@im=ibus
 export TERM="xterm-256color"
 export LC_ALL="en_US.UTF-8"
 export LANG="en_US.UTF-8"
+
+export PATH="$HOME/.pyenv/bin:$HOME/.cargo/bin:$PATH"
+eval "$(pyenv init -)"

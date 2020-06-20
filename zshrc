@@ -86,8 +86,8 @@ auto-ls-ls(){
 }
 
 # some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
+alias ll='ls -ahlF'
+alias la='ls -Ah'
 alias l='ls'
 
 alias clean="rm -i *.bbl *.bcf *.aux *.log *.blg *.run.xml *.synctex.gz"
@@ -117,22 +117,9 @@ if [ -f /usr/local/gromacs/bin/GMXRC ]; then
     source "/usr/local/gromacs/bin/GMXRC"
 fi
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/zenith-john/anaconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/home/zenith-john/anaconda3/etc/profile.d/conda.sh" ]; then
-        . "/home/zenith-john/anaconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/home/zenith-john/anaconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
-
 source /usr/share/nvm/init-nvm.sh
+
+export PATH="$HOME/.pyenv/bin:$PATH"
 
 autoload -U compinit && compinit -u
 # zprof

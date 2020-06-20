@@ -1,4 +1,5 @@
 #!/bin/sh
 
 fcitx &
+xcape -e "Control_L=Escape;Alt_R=Control_L|x;Super_L=Alt_L|F1;Shift_R=Control_L|c" -t 200
 emacs --daemon
