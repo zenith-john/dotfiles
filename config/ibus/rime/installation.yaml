@@ -1,8 +1,8 @@
-distribution_code_name: "fcitx-rime"
+distribution_code_name: "emacs-rime"
 distribution_name: Rime
-distribution_version: 0.2.3
+distribution_version: 1.0.1
 install_time: "Thu Nov 29 20:53:44 2018"
 installation_id: "61fc3692-e9a9-4602-9091-d350c34c881d"
 rime_version: 1.5.3
 sync_dir: "/home/zenith-john/Dropbox/rime"
-update_time: "Tue Apr 21 12:09:57 2020"
+update_time: "Thu Jul  2 13:27:15 2020"

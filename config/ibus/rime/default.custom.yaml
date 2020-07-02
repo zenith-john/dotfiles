@@ -5,7 +5,7 @@ patch:
   switcher:
     caption: 〔方案选单〕
     hotkeys:
-    - Control+grave
+    - F4
 
   # 候选词 5 个
   menu:
@@ -16,8 +16,9 @@ patch:
   - schema: luna_pinyin_fluency  # 语句流
   - schema: cangjie5
   #- schema: wubi_pinyin          # 五笔拼音混合輸入
-  - schema: wubi86               # 五笔86
+  #- schema: wubi86               # 五笔86
   - schema: luna_pinyin_tw       # 朙月拼音·臺灣正體，可以按 ctrl+` 選擇臨時啓用简体中文
+  - schema: pinyin_simp
 
   ascii_composer:
     good_old_caps_lock: true

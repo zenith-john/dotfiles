@@ -56,6 +56,7 @@ import_tables:
   #
   - f_myphrases
   - f_mysecretphrases
+  - zhwiki
 ...
 
 一一列舉		1

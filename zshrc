@@ -90,7 +90,15 @@ alias ll='ls -ahlF'
 alias la='ls -Ah'
 alias l='ls'
 
-alias clean="rm -i *.bbl *.bcf *.aux *.log *.blg *.run.xml *.synctex.gz"
+clean(){
+    rm -i *.bbl || true
+    rm -i *.bcf || true
+    rm -i *.aux || true
+    rm -i *.log || true
+    rm -i *.blg || true
+    rm -i *.run.xml || true
+    rm -i *.synctex.gz || true
+}
 
 if [ $+commands[ccat] ]; then
     alias c=ccat
@@ -117,7 +125,7 @@ if [ -f /usr/local/gromacs/bin/GMXRC ]; then
     source "/usr/local/gromacs/bin/GMXRC"
 fi
 
-source /usr/share/nvm/init-nvm.sh
+# source /usr/share/nvm/init-nvm.sh
 
 export PATH="$HOME/.pyenv/bin:$PATH"
 

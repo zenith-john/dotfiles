@@ -4,6 +4,15 @@
 *.aux
 *.bbl
 *.bcf
+*.fls
+*latexmk
+*.idx
+*.ind
+*.ilg
+*.out
+*.rip
+*.thm
+*.toc
 *.blg
 *.pdf
 *.log

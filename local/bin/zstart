@@ -1,5 +1,6 @@
 #!/bin/sh
 
-fcitx &
-xcape -e "Control_L=Escape;Alt_R=Control_L|x;Super_L=Alt_L|F1;Shift_R=Control_L|c" -t 200
+fcitx5 &
+xcape -e "Control_L=Escape;Super_L=XF86Launch1;Shift_R=Menu" -t 200
+xbindkeys --poll-rc
 emacs --daemon
