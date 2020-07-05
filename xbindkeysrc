@@ -57,7 +57,7 @@
 "wmctrl -x -R zathura || zathura"
   Mod4+y
 
-"rofi -show window"
+"rofi -show window -auto-select"
   XF86Launch1
 
 "rofi -combi-modi window,drun -show combi -modi combi"
