@@ -1,0 +1,1 @@
+/home/zenith-john/.zplug/repos/skywind3000/z.lua/ranger_zlua.py

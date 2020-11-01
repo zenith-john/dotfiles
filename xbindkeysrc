@@ -39,23 +39,29 @@
 
 # Examples of commands:
 
-"wmctrl -x -a okular || okular" 
+"jumpapp okular" 
   Mod4+o
 
-"wmctrl -x -a emacs || emacsclient -c"
+"jumpapp -c emacs emacsclient -c"
   Mod4+u
 
-"wmctrl -x -R konsole ||  konsole" 
+"jumpapp -R konsole" 
   Mod4+k
 
-"wmctrl -x -a firefox || firefox"
+"jumpapp firefox"
   Mod4+i
 
-"wmctrl -x -a dolphin || dolphin"
-  Mod4+l
+"jumpapp -R dolphin"
+  Mod4+comma
 
-"wmctrl -x -R zathura || zathura"
+"jumpapp -R zathura"
   Mod4+y
+
+"jumpapp -f -m -R goldendict"
+  F8
+
+"flameshot gui"
+  Print
 
 "rofi -show window -auto-select"
   XF86Launch1

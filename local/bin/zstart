@@ -1,5 +1,7 @@
 #!/bin/sh
 
 fcitx5 &
-xcape -e "Control_L=Escape;Super_L=XF86Launch1;Shift_R=Menu" -t 200
+xcape -e "Super_L=XF86Launch1" -t 200
 xbindkeys --poll-rc
+setxkbmap -option caps:shiftlock
+setxkbmap -option ctrl:nocaps
