@@ -74,6 +74,8 @@ alias ....="cd ../../.."
 alias e="TERM=xterm-256color emacsclient -nw -c"
 alias ek="emacsclient -e \"(kill-emacs)\""
 
+alias o="xdg-open"
+
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     alias ls='ls --color=auto'
@@ -83,6 +85,10 @@ AUTO_LS_COMMANDS=(ls)
 auto-ls-ls(){
     ls --color=auto
     [[ $AUTO_LS_NEWLINE != false ]] && echo ""
+}
+
+under(){
+    mv "$1" "${1// /_}"
 }
 
 # some more ls aliases
@@ -119,6 +125,7 @@ alias pip=pip3
 # z.lua configuration
 export _ZL_MATCH_MODE=1
 eval "$(lua ~/.zplug/repos/skywind3000/z.lua/z.lua --init zsh)"
+alias zp="z -I | fzf | awk '{print \$2}'"
 
 # load GMXRC
 if [ -f /usr/local/gromacs/bin/GMXRC ]; then
