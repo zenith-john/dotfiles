@@ -53,4 +53,7 @@ export LC_ALL="en_US.UTF-8"
 export LANG="en_US.UTF-8"
 
 export PATH="$HOME/.pyenv/bin:$HOME/.cargo/bin:$PATH"
-eval "$(pyenv init -)"
+# eval "$(pyenv init -)"
+export DISPLAY=$(awk '/nameserver / {print $2; exit}' /etc/resolv.conf 2>/dev/null):0 # in WSL 2
+
+source "$HOME/.cargo/env"
