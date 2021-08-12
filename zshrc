@@ -72,6 +72,7 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 
 alias e="TERM=xterm-256color emacsclient -nw -c"
+alias em="emacs -nw > /dev/null"
 alias ek="emacsclient -e \"(kill-emacs)\""
 
 alias o="xdg-open"
@@ -135,6 +136,8 @@ fi
 # source /usr/share/nvm/init-nvm.sh
 
 export PATH="$HOME/.pyenv/bin:$PATH"
+export TERM="xterm-256color"
+export COLORTERM=truecolor
 
 autoload -U compinit && compinit -u
 # zprof
