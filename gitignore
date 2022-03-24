@@ -14,7 +14,6 @@
 *.thm
 *.toc
 *.blg
-*.pdf
 *.log
 *.run.xml
 *.synctex.gz

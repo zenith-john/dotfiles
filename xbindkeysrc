@@ -54,11 +54,17 @@
 "jumpapp -R dolphin"
   Mod4+comma
 
+"jumpapp zotero"
+  Mod4+semicolon
+
 "jumpapp -R zathura"
   Mod4+y
 
 "jumpapp -f -m -R goldendict"
   F8
+
+"xdotool key ctrl+c; xdotool key ctrl+F11;"
+  F9 + Release
 
 "flameshot gui"
   Print
@@ -68,6 +74,12 @@
 
 "rofi -combi-modi window,drun -show combi -modi combi"
   Mod4+p
+
+"jumpapp fsearch"
+  F10
+
+"screenOCR"
+  Mod1+Print
 
 #"xterm -geom 50x20+20+20"
 #   Shift+Mod2+alt + s

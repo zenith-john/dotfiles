@@ -98,13 +98,13 @@ alias la='ls -Ah'
 alias l='ls'
 
 clean(){
-    rm -i *.bbl || true
-    rm -i *.bcf || true
-    rm -i *.aux || true
-    rm -i *.log || true
-    rm -i *.blg || true
-    rm -i *.run.xml || true
-    rm -i *.synctex.gz || true
+    rm *.bbl || true
+    rm *.bcf || true
+    rm *.aux || true
+    rm *.log || true
+    rm *.blg || true
+    rm *.run.xml || true
+    rm *.synctex.gz || true
 }
 
 if [ $+commands[ccat] ]; then
@@ -138,6 +138,10 @@ fi
 export PATH="$HOME/.pyenv/bin:$PATH"
 export TERM="xterm-256color"
 export COLORTERM=truecolor
+
+# proxy setting
+alias proxyon="export http_proxy='http://127.0.0.1:20171'; export https_proxy='http://127.0.0.1:20171'"
+alias proxyoff="unset http_proxy; unset https_proxy"
 
 autoload -U compinit && compinit -u
 # zprof

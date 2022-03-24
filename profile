@@ -55,9 +55,12 @@ export LANG="en_US.UTF-8"
 export TEXMACS_PATH="/opt/TeXmacs"
 export PATH="$TEXMACS_PATH/bin:$HOME/.pyenv/bin:$HOME/.cargo/bin:$PATH"
 # eval "$(pyenv init -)"
-export WINIP=$(awk '/nameserver / {print $2; exit}' /etc/resolv.conf 2>/dev/null)
-export DISPLAY=$WINIP:0 # in WSL 2
+# export WINIP=$(awk '/nameserver / {print $2; exit}' /etc/resolv.conf 2>/dev/null)
+# export DISPLAY=$WINIP:0 # in WSL 2
 
-git config --global http.proxy "socks5://${WINIP}:10800"
+# git config --global http.proxy "socks5://${WINIP}:10800"
 
-source "$HOME/.cargo/env"
+# . "$HOME/.cargo/env"
+export QT_STYLE_OVERRIDE=kvantum
+export TESSDATA_PREFIX=~/.local/share/tesseract-ocr/tessdata/4.1.0
+
